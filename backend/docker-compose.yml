@@ -1,0 +1,14 @@
+#docker-compose file
+version: '3'
+
+services:
+  nestapp:
+    container_name: gcp-backend
+    image: node:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
