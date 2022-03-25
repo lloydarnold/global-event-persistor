@@ -17,18 +17,18 @@ mongoose.connection.on('error', function (err) {
 // model for event schema, as outlined in planning
 // category - finite number, can't take any old string. Same for subcategories.
 // put validation in at controller level - makes easier to swap out for other DB
-mongoose.exports.event=mongoose.model('event', new Schema({
+mongoose.exports.event = mongoose.model('Event', new Schema({
     timeStamp : [ new Schema({ event : Date, source : Date }) ],
     category : String,
-    subcategory : String,
+    subcategory : String, 
     detail : String,
-    region : Schema.Types.ObjectId,
+    region : { type: Schema.Types.ObjectId, ref: 'Location'},
     actors : String,
     stocks : String
 }));
 
 // model for location data, as proposed by @Felipe
-mongoose.exports.event=mongoose.model('location', new Schema({new Schema({
+mongoose.exports.event = mongoose.model('Location', new Schema({
   continent : String,
   country : String,
   state : String,
