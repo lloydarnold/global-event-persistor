@@ -128,6 +128,10 @@ export class EventsService {
       });
     }
 
+    async findByStock(stock: String) {
+      return this.eventModel.find({ stocks: stock }).exec()
+    }
+
     private timeMillis(date: Date) : number {
       return new Date(date).getTime()
     }
@@ -135,7 +139,7 @@ export class EventsService {
     async findEventsGeneral(query: QueryDTO) {
       var eventsQuery = this.eventModel.find();
 
-      if (query.stock) eventsQuery.where('stock').equals(query.stock)
+      if (query.stock) eventsQuery.where('stocks').equals(query.stock)
 
       if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
       if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
@@ -168,7 +172,7 @@ export class EventsService {
         const regions = await this.regionModel.find(regionAttributes).exec()
         eventsQuery.where('region').in(regions);
       }
-      
+
       return eventsQuery.exec()
     }
 }
