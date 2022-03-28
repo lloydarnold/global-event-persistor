@@ -6,11 +6,11 @@ import { Event, Region, EventCreationDTO } from './events.model';
 @Injectable()
 export class EventsService {
     constructor (
-        @InjectModel('Event') private readonly eventModel: Model<Event>, 
+        @InjectModel('Event') private readonly eventModel: Model<Event>,
         @InjectModel('Region') private readonly regionModel: Model<Region>){
 
         }
-    
+
     // separateEventRegion(eventCreationDTO: EventCreationDTO) {
     //     const event : Event = {
     //         id: eventCreationDTO.id,
@@ -47,7 +47,7 @@ export class EventsService {
         console.log(this.regionModel);
         console.log(eventCreationDTO.source)
 
-        const docs = await this.regionModel.find( { 
+        const docs = await this.regionModel.find( {
             continent: eventCreationDTO.continent,
             country: eventCreationDTO.country,
             state: eventCreationDTO.state,
@@ -79,5 +79,12 @@ export class EventsService {
         return this.eventModel.find({
             timeStamp: { $gte: from, $lte: to }
         }).exec();
+    }
+
+    async findEventsOfCategory(myCat: String, mySubCat: String ): Promise<Event[]> {
+      return this.eventModel.find({
+            category: myCat,
+            subcategory : mySubCat
+      }).exec();
     }
 }
