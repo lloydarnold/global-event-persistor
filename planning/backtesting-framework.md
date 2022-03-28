@@ -113,12 +113,17 @@ Provisionally, it will accept the following operations. This can be expanded if
         <host>:<port>/events/get-in-range?from=01 Jan 1970 00:00:00 GMT&
           to=11 Jan 1970 00:00:00 GMT
 
-    get-regions - returns events by a given locality
+    get-regions - returns all regions
+      possible error codes : Permission-Denied
+      Example use :
+        <host>:<port>/events/get-regions
+
+    get-by-region - returns events by a given locality
       Params :- continent:String, county:String, state: String, city: String
       possible errors : Permission-Denied, Invalid-Continent, Invalid-Country,
         Invalid-State, City-Not-Found
       Example Use :
-        <host>:<port>/events/get-regions?continent=OC&country=AUS
+        <host>:<port>/events/get-by-region?continent=OC&country=AUS
           &state=QUEENSLAND&city=ALL
 
     get-stock - query for events relating to particular stock / commodity / crypto
