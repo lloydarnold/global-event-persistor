@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Event, Region, EventCreationDTO } from './events.model';
+import { Event, Region, EventCreationDTO, QueryDTO } from './events.model';
 import * as CATS from './../res/categories.json';
 
 @Injectable()
@@ -60,10 +60,12 @@ export class EventsService {
         if (docs.length == 0) {
             const createdRegion = new this.regionModel(eventCreationDTO)
             console.log(`Region ${createdRegion} did not exist but was created`);
-            doc = createdRegion.save()
+            doc = await createdRegion.save()
         }
         else doc = docs[0]
         eventCreationDTO.region = doc._id
+        console.log(doc)
+        console.log(eventCreationDTO)
         createdEvent = new this.eventModel(eventCreationDTO);
         return createdEvent.save();
     }
@@ -124,5 +126,49 @@ export class EventsService {
         category: cat,
         subcategory : sub,
       });
+    }
+
+    private timeMillis(date: Date) : number {
+      return new Date(date).getTime()
+    }
+
+    async findEventsGeneral(query: QueryDTO) {
+      var eventsQuery = this.eventModel.find();
+
+      if (query.stock) eventsQuery.where('stock').equals(query.stock)
+
+      if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
+      if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
+
+      if (query.category) {
+        eventsQuery.where('category').equals(query.category)
+        if (query.subcategory) {
+          if (!(CATS[`${query.category}`].includes(query.subcategory)))
+            throw new Error("Subcategory does not belong to the given category")
+            eventsQuery.where('subcategory').equals(query.subcategory)
+        }
+      }
+
+      var regionAttributes = {
+        continent: query.continent,
+        country: query.country,
+        state: query.state,
+        city: query.city,
+      }
+      console.log(regionAttributes)
+
+      // delete unspecified fields, thus defaulting to `ALL`
+      Object.keys(regionAttributes).forEach(key => { 
+          if (regionAttributes[key] == undefined) {
+              delete regionAttributes[key]
+          }
+      })
+      
+      if (Object.keys(regionAttributes).length > 0) {
+        const regions = await this.regionModel.find(regionAttributes).exec()
+        eventsQuery.where('region').in(regions);
+      }
+      
+      return eventsQuery.exec()
     }
 }

@@ -98,7 +98,7 @@ export class EventsController {
   *  PRE : subcategory in catCodes.category || subcategory = Null &&
   *     catCodes.category != Null
   */
-  @Get('get-category')
+  @Get('get-by-category')
   async fetchEventsByCategory(@Res() response, @Query() query: QueryDTO) {
     var cat = query.category;
     var sub = query.subcategory;
@@ -106,6 +106,21 @@ export class EventsController {
     console.log(`Queried events of type : ${cat}, subtype : ${sub}`);
     try {
         const events = await this.eventsService.findEventsOfCategory(cat, sub);
+        return response.status(HttpStatus.OK).json({
+            events
+        })
+    } catch (e) {
+        console.error(e)
+        return response.status(HttpStatus.BAD_REQUEST).json({
+            message: e.message
+        })
+    }
+  }
+
+  @Get('get-events')
+  async fetchEventsGeneral(@Res() response, @Query() query: QueryDTO) {
+    try {
+        const events = await this.eventsService.findEventsGeneral(query);
         return response.status(HttpStatus.OK).json({
             events
         })

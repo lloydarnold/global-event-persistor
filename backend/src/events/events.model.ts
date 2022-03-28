@@ -76,4 +76,6 @@ export class QueryDTO {
     category: String;
     subcategory: String
     // TODO: add ~category~ and region options
+
+    stock: String
 }
