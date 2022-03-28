@@ -137,3 +137,13 @@ Provisionally, it will accept the following operations. This can be expanded if
       possible errors : Permission-Denied, Cat-Not-Found, Sub-Cat-Not-Found
       Example Use :
         <host>:<port>/events/get-category?category=EXW&subcategory=TOR
+
+    get-events - query by all criteria above at once
+      Params :- from:Date, to:Date, continent:String, county:String, 
+                state: String, city: String, stock:String, category:String, subcategory:String
+      possible errors : Permission-Denied, From-Date-Invalid, To-Date-Invalid,  Invalid-Continent, 
+                        Invalid-Country,Invalid-State, City-Not-Found,  Stock-Not-Tracked, 
+                        Cat-Not-Found, Sub-Cat-Not-Found
+      Example Use:
+        <host>:<port>/events/get-events?from=2022-02-03&to=2022-03-03&continent=NA&country=USA
+          &state=CALIFORNIA&city=CUPERTINO&stock=AAPL&category=EXW&subcategory=TOR
