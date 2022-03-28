@@ -18,7 +18,7 @@ export const EventSchema = new mongoose.Schema({
     category: { type: String, required: true },
     subcategory: { type: String },
     detail : String,
-    region : { type: mongoose.Schema.Types.ObjectId, ref: 'Location'},
+    region : { type: mongoose.Schema.Types.ObjectId, ref: 'Region'},
     actors : [String],
     stocks : [String]
 })
