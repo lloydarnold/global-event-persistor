@@ -65,7 +65,8 @@ export class EventCreationDTO {
 
 export class QueryDTO {
     from: Date;
-    to: Date; 
-
-    // TODO: add category and region options
+    to: Date;
+    category: String;
+    subcategory: String
+    // TODO: add ~category~ and region options
 }
