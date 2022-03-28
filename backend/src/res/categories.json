@@ -1,9 +1,9 @@
-[
-  {"FIN" : ["CER", "PRL", "OCH", "LAW", "MA"]},
-  {"MEC" : ["EMPD", "KEI", "INR", "QE"]},
-  {"GEOP" : ["TRW", "ELEC", "REF", "FLP", "COU", "CIG", "TRD"]},
-  {"EXW" : ["HUR", "NST", "EQ", "TSU", "TOR"]},
-  {"SPO" : ["FOOT", "AMFOOT", "CRI", "BASE", "FONE", "GOLF", "RUG", "OLY"]},
-  {"ENT" : ["MUS", "MOV", "GAM", "STD"]},
-  {"MISC" : ["FAL"]}
-]
+{
+  "FIN" : ["*", "CER", "PRL", "OCH", "LAW", "MA"],
+  "MEC" : ["*", "EMPD", "KEI", "INR", "QE"],
+  "GEOP" : ["*", "TRW", "ELEC", "REF", "FLP", "COU", "CIG", "TRD"],
+  "EXW" : ["*", "HUR", "NST", "EQ", "TSU", "TOR"],
+  "SPO" : ["*", "FOOT", "AMFOOT", "CRI", "BASE", "FONE", "GOLF", "RUG", "OLY"],
+  "ENT" : ["*", "MUS", "MOV", "GAM", "STD"],
+  "MISC" : ["*", "FAL"]
+}
