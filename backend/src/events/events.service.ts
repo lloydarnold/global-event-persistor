@@ -81,9 +81,9 @@ export class EventsService {
         }).exec();
     }
 
-    async findEventsOfCategory(myCat: String, mySubCat: String ): Promise<Event[]> {
+    async findEventsOfCategory(myCat: String, mySubCat: String|null ): Promise<Event[]> {
       return this.eventModel.find({
-            category: myCat,
+            category : myCat,
             subcategory : mySubCat
       }).exec();
     }

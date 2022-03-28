@@ -95,21 +95,19 @@ export class EventsController {
   @Get('get-category')
   async fetchEventsByCategory(@Res() response, @Query() query: QueryDTO) {
     var cat = query.category;
-    var sub = query.subcategory;
+    var sub :String| null = query.subcategory;
 
     if ( cat == null )
     {
-      cat = "*"; //if category is null, return all categories
-      sub = "*";
+      sub = null  // can't search subcategory if no category.
       console.log("Category query with no category")
     }
     else if ( sub == null )
     {
-      sub = "*";
       console.log("Category query with no subcategory");
     }
 
-    if ( cat == "*" || CATS[`${cat}`].includes(sub) ) {
+    if ( sub == null || CATS[`${cat}`].includes(sub) ) {
       const events = await this.eventsService.findEventsOfCategory(cat, sub);
       return response.status(HttpStatus.OK).json({
           events
@@ -117,9 +115,6 @@ export class EventsController {
     }
 
     console.log(`Queried events of type : ${cat}, subtype : ${sub}`);
-
-
-
 
   }
 
