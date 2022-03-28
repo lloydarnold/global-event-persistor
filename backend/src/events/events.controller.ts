@@ -1,4 +1,4 @@
-import { 
+import {
     Controller,
     Body,
     Post,
@@ -20,7 +20,7 @@ export class EventsController {
     /**
      * Create an event in the events database. If the associated region was not already registered
      * in the `regions` database, a record for it is also created.
-     * 
+     *
      * Post JSON fields:
      * @param timeStamp (required): string that can be converted to Date object (e.g. YYYY-MM-DD)
      * @param sentiment: number between -100 and 100
@@ -30,7 +30,7 @@ export class EventsController {
      * @param detail: description of the event
      * @param actors: array of strings with names of actors involved in event
      * @param stocks: array of codes of stocks directly related to event
-     * 
+     *
      * @param continent: full name of continent of the event (e.g. "Europe")
      * @param country: full name of country of the event (e.g. "People's Republic of China")
      * @param state: administrative region within the country (can be state, province, etc.)
@@ -44,7 +44,7 @@ export class EventsController {
     }
 
     /**
-     * Returns an array with every event in the `events` database 
+     * Returns an array with every event in the `events` database
      */
     @Get('/get-all')
     async fetchAllEvents(@Res() response) {
@@ -56,7 +56,7 @@ export class EventsController {
 
     /**
      * Returns event in a given time range.
-     * 
+     *
      * Query structure:
      * @param from: beginning of time range, as a Date (or Datetime) string
      * @param to: end of time range (inclusive), as Date (or Datetime) string
@@ -89,5 +89,32 @@ export class EventsController {
         return response.status(HttpStatus.OK).json({ events })
         
     }
+ /**
+  *  Query by category
+  *  @param category : String - category code
+  *  @param subcategory : String - subcategory code. If left blank will return
+  *    all all events in a category
+  *
+  *  PRE : subcategory in catCodes.category || subcategory = Null &&
+  *     catCodes.category != Null
+  */
+  @Get('get-category')
+  async fetchEventsByCategory(@Res() response, @Query() query: QueryDTO) {
+    var cat = query.category;
+    var sub = query.subcategory;
+
+    console.log(`Queried events of type : ${cat}, subtype : ${sub}`);
+    try {
+        const events = await this.eventsService.findEventsOfCategory(cat, sub);
+        return response.status(HttpStatus.OK).json({
+            events
+        })
+    } catch (e) {
+        console.error(e)
+        return response.status(HttpStatus.BAD_REQUEST).json({
+            message: e.message
+        })
+    }
+  }
 
 }

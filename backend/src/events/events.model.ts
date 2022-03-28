@@ -73,4 +73,7 @@ export class QueryDTO {
     city : string;
 
     // TODO: add category and region options
+    category: String;
+    subcategory: String
+    // TODO: add ~category~ and region options
 }

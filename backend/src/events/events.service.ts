@@ -2,15 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, Region, EventCreationDTO } from './events.model';
+import * as CATS from './../res/categories.json';
 
 @Injectable()
 export class EventsService {
     constructor (
-        @InjectModel('Event') private readonly eventModel: Model<Event>, 
+        @InjectModel('Event') private readonly eventModel: Model<Event>,
         @InjectModel('Region') private readonly regionModel: Model<Region>){
 
         }
-    
+
     // separateEventRegion(eventCreationDTO: EventCreationDTO) {
     //     const event : Event = {
     //         id: eventCreationDTO.id,
@@ -47,7 +48,7 @@ export class EventsService {
         console.log(this.regionModel);
         console.log(eventCreationDTO.source)
 
-        const docs = await this.regionModel.find( { 
+        const docs = await this.regionModel.find( {
             continent: eventCreationDTO.continent,
             country: eventCreationDTO.country,
             state: eventCreationDTO.state,
@@ -103,5 +104,25 @@ export class EventsService {
         return this.eventModel.find({
             'region': { $in: regions }
         }).exec()
+    }
+    
+    async findEventsOfCategory(cat: String, sub: String ): Promise<Event[]> {
+      if ( cat == null ) {
+        console.log("Category query with no category");
+        return this.eventModel.find({}).exec();
+      }
+
+      else if ( sub == null ) {
+        console.log("Category query with no subcategory");
+        return this.eventModel.find({ category: cat }).exec();
+      }
+
+      if (!(CATS[`${cat}`].includes(sub)))
+        throw new Error("Subcategory does not belong to the given category")
+
+      return this.eventModel.find({
+        category: cat,
+        subcategory : sub,
+      });
     }
 }
