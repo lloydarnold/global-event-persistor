@@ -80,4 +80,28 @@ export class EventsService {
             timeStamp: { $gte: from, $lte: to }
         }).exec();
     }
+
+    async findEventsInRegion(continent: String, country: String, state: String, city: String): Promise<Event[]> {
+        var regionAttributes = {
+            continent: continent,
+            country: country,
+            state: state,
+            city: city,
+        }
+
+        console.log(regionAttributes)
+
+        // delete unspecified fields, thus defaulting to `ALL`
+        Object.keys(regionAttributes).forEach(key => { 
+            if (regionAttributes[key] == undefined) {
+                delete regionAttributes[key]
+            }
+        })
+
+        const regions = await this.regionModel.find(regionAttributes).exec()
+        
+        return this.eventModel.find({
+            'region': { $in: regions }
+        }).exec()
+    }
 }

@@ -67,5 +67,10 @@ export class QueryDTO {
     from: Date;
     to: Date; 
 
+    continent : string;
+    country : string;
+    state: string; // state, province, county, etc; varies
+    city : string;
+
     // TODO: add category and region options
 }

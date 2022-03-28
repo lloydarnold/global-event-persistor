@@ -81,4 +81,13 @@ export class EventsController {
         })
     }
 
+    @Get('get-by-region')
+    async fetchEventsInRegion(@Res() response, @Query() query: QueryDTO) {
+        var events =  await this.eventsService.findEventsInRegion(
+                                            query.continent, query.country, query.state, query.city)
+
+        return response.status(HttpStatus.OK).json({ events })
+        
+    }
+
 }
