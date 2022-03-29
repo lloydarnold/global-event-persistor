@@ -17,8 +17,8 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  /**
-   * Create an event in the events database. If the associated region was not already registered
+  /** Create an event in the events database.
+   * If the associated region was not already registered
    * in the `regions` database, a record for it is also created.
    *
    * Post JSON fields:
@@ -43,8 +43,7 @@ export class EventsController {
       })
   }
 
-  /**
-   * Returns an array with every event in the `events` database
+  /** Returns an array with every event in the `events` database
    */
   @Get('/get-all')
   async fetchAllEvents(@Res() response) {
@@ -54,12 +53,10 @@ export class EventsController {
       })
   }
 
-  /**
-   * Returns event in a given time range.
-   *
-   * Query structure:
-   * @param from: beginning of time range, as a Date (or Datetime) string
-   * @param to: end of time range (inclusive), as Date (or Datetime) string
+ /** Returns event in a given time range
+   *  Query structure:
+   *  @param from: beginning of time range, as a Date (or Datetime) string
+   *  @param to: end of time range (inclusive), as Date (or Datetime) string
    *
    * PRE : from, to are both in valid date format
    * TODO add validation on timestamp format
@@ -73,8 +70,7 @@ export class EventsController {
       })
   }
 
-  /**
-   * Returns every region in the `regions` database.
+  /** Returns every region in the `regions` database.
    */
   @Get('/get-regions')
   async fetchAllRegions(@Res() response) {
@@ -85,9 +81,8 @@ export class EventsController {
   }
 
 
-  /**
-   * Take a string, strip it of characters not in the Latin alphabet, convert to
-   * upper case
+  /** Take a string, strip it of characters not in the Latin alphabet,
+   *  convert to upper case
    *
    * @param toStrip : String string to be stripped and converted
    */
@@ -109,9 +104,8 @@ export class EventsController {
     return r.toUpperCase()
   }
 
-  /**
-   *  Query events based on their region.
-   *
+  /** Query events based on their region
+.   *
    * API params :
    * @param continent : String
    * @param country : String
@@ -130,8 +124,8 @@ export class EventsController {
       return response.status(HttpStatus.OK).json({ events })
 
   }
- /**
-  *  Query by category
+
+/** Query by category
   *
   * API parameters :
   *  @param category : String - category code
@@ -161,8 +155,7 @@ export class EventsController {
     }
   }
 
-  /**
-   * Query by stock / commodity
+ /** Query by stock / commodity
    *
    * API parameters :
    * @param stock : String - stock code, using code as traded on relevant market
@@ -179,7 +172,7 @@ export class EventsController {
       })
   }
 
-  /**
+  /** general query 
    *  A generalised query function; allows queries by any parameter that may
    *  otherwise by used.
    */
