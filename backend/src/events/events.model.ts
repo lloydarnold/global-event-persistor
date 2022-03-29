@@ -8,6 +8,14 @@ export const RegionSchema = new mongoose.Schema({
     city : String
 })
 
+export interface Region extends mongoose.Document {
+    id_reg: mongoose.Schema.Types.ObjectId;
+    continent : string;
+    country : string;
+    state: string; // state, province, county, etc; varies
+    city : string;
+}
+
 export const EventSchema = new mongoose.Schema({
     timeStamp: { type: Date, required: true },
     positivity: Number,
@@ -30,17 +38,9 @@ export interface Event extends mongoose.Document {
     category: string;
     subcategory: string;
     detail: string;
-    region: mongoose.Schema.Types.ObjectId;
+    region: { type: mongoose.Schema.Types.ObjectId, ref: 'Region'};
     actors: string[];
     stocks: string[]
-}
-
-export interface Region extends mongoose.Document {
-    id_reg: mongoose.Schema.Types.ObjectId;
-    continent : string;
-    country : string;
-    state: string; // state, province, county, etc; varies
-    city : string;
 }
 
 export class EventCreationDTO {

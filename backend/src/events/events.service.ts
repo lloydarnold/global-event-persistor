@@ -8,33 +8,10 @@ import * as CONTS from './../res/continents.json'
 @Injectable()
 export class EventsService {
     constructor (
-        @InjectModel('Event') private readonly eventModel: Model<Event>,
-        @InjectModel('Region') private readonly regionModel: Model<Region>){
+      @InjectModel('Event') private readonly eventModel: Model<Event>,
+      @InjectModel('Region') private readonly regionModel: Model<Region>){
+    }
 
-        }
-
-    // separateEventRegion(eventCreationDTO: EventCreationDTO) {
-    //     const event : Event = {
-    //         id: eventCreationDTO.id,
-    //         timeStamp: eventCreationDTO.timeStamp,
-    //         sentiment: eventCreationDTO.sentiment,
-    //         source: eventCreationDTO.source,
-    //         category: eventCreationDTO.category,
-    //         subcategory: eventCreationDTO.subcategory,
-    //         detail: eventCreationDTO.detail,
-    //         region: eventCreationDTO.region,
-    //         actors: eventCreationDTO.actors,
-    //         stocks: eventCreationDTO.stocks,
-    //     }
-    //     const region : Region = {
-    //         id_reg: eventCreationDTO.id_reg,
-    //         continent : eventCreationDTO.continent,
-    //         country : eventCreationDTO.country,
-    //         state: eventCreationDTO.state, // state, province, county, etc; varies
-    //         city : eventCreationDTO.city,
-    //     }
-    // }
-    
     /** Prepare an event received from endpoint for creation.
       *  @param eventDict
       *   Validates the given region
@@ -63,7 +40,6 @@ export class EventsService {
 
       // console.log(docs);
 
-      var createdEvent = new this.eventModel(eventCreationDTO);
       var doc;
       if (docs.length == 0) {
           const createdRegion = new this.regionModel(myRegion)
@@ -174,7 +150,7 @@ export class EventsService {
     }
 
     async findAllEvents(): Promise<Event[]> {
-        return this.eventModel.find().exec();
+        return this.eventModel.find().populate('region', '', this.regionModel).exec();
     }
 
     async findAllRegions(): Promise<Region[]> {
@@ -184,7 +160,7 @@ export class EventsService {
     async findEventsInRange(from: Date, to: Date): Promise<Event[]> {
         return this.eventModel.find({
             timeStamp: { $gte: from, $lte: to }
-        }).exec();
+        }).populate('region', '', this.regionModel).exec();
     }
 
     async findEventsInRegion(continent: String, country: String, state: String, city: String|null): Promise<Event[]> {
@@ -208,19 +184,19 @@ export class EventsService {
 
         return this.eventModel.find({
             'region': { $in: regions }
-        }).exec()
+        }).populate('region', '', this.regionModel).exec()
     }
 
     async findEventsOfCategory(cat: String, sub: String ): Promise<Event[]> {
       if ( cat == null ) {
         console.log("Category query with no category");
         // TODO review if this makes sense or if we should throw an error.
-        return this.eventModel.find({}).exec();
+        return this.eventModel.find({}).populate('region', '', this.regionModel).exec();
       }
 
       else if ( sub == null ) {
         console.log("Category query with no subcategory");
-        return this.eventModel.find({ category: cat }).exec();
+        return this.eventModel.find({ category: cat }).populate('region', '', this.regionModel).exec();
       }
 
       if (!(CATS[`${cat}`].includes(sub)))
@@ -229,11 +205,11 @@ export class EventsService {
       return this.eventModel.find({
         category: cat,
         subcategory : sub,
-      });
+      }).populate('region', '', this.regionModel).exec();
     }
 
     async findByStock(stock: String) {
-      return this.eventModel.find({ stocks: stock }).exec()
+      return this.eventModel.find({ stocks: stock }).populate('region', '', this.regionModel).exec()
     }
 
     private timeMillis(date: Date) : number {
@@ -279,6 +255,6 @@ export class EventsService {
         eventsQuery.where('region').in(regions);
       }
 
-      return eventsQuery.exec()
+      return eventsQuery.populate('region', '', this.regionModel).exec()
     }
 }
