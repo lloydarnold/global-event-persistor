@@ -213,6 +213,8 @@ export class EventsService {
 
       if (query.stock) eventsQuery.where('stocks').equals(query.stock)
 
+      if (query.from && query.to) 
+        eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)).lte(this.timeMillis(query.to))
       if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
       if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
 
