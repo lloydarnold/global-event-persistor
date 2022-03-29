@@ -34,6 +34,48 @@ export class EventsService {
     //         city : eventCreationDTO.city,
     //     }
     // }
+    
+    /** Prepare an event received from endpoint for creation.
+      *  @param eventDict
+      *   Validates the given region
+      *   Verifies if region exists and create one if not
+      *   Connects event with the corresponding region record
+      *   TODO (?) - Parse relevant stocks - is this the place or is that a job
+      *     for scrapers ?
+      *
+      * PRE : continent, country, state are in correct form
+      */
+    private async prepareForCreation(eventCreationDTO: EventCreationDTO) {
+      var myRegion = {
+        continent: eventCreationDTO.continent,
+        country: eventCreationDTO.country,
+        state: eventCreationDTO.state,
+        city:  eventCreationDTO.city
+      };
+
+      myRegion = this.validateRegion(myRegion);
+
+      // console.log(myRegion);
+
+      const docs = await this.regionModel.find(
+        myRegion
+      ).exec();
+
+      // console.log(docs);
+
+      var createdEvent = new this.eventModel(eventCreationDTO);
+      var doc;
+      if (docs.length == 0) {
+          const createdRegion = new this.regionModel(myRegion)
+          console.log(`Region ${createdRegion} did not exist but was created`);
+          doc = await createdRegion.save()
+      }
+      else doc = docs[0]
+      eventCreationDTO.region = doc._id
+      console.log(doc);
+      console.log();
+      console.log(eventCreationDTO);
+    }
 
     /** Create event
       *  @param eventDict
@@ -49,38 +91,29 @@ export class EventsService {
         // console.log(new this.regionModel(eventCreationDTO));
         // console.log(eventCreationDTO.source);
 
-        var myRegion = {
-          continent: eventCreationDTO.continent,
-          country: eventCreationDTO.country,
-          state: eventCreationDTO.state,
-          city:  eventCreationDTO.city
-        };
-
-        myRegion = this.validateRegion(myRegion);
-
-        // console.log(myRegion);
-
-        const docs = await this.regionModel.find(
-          myRegion
-        ).exec();
-
-        // console.log(docs);
-
-        var createdEvent = new this.eventModel(eventCreationDTO);
-        var doc;
-        if (docs.length == 0) {
-            const createdRegion = new this.regionModel(myRegion)
-            console.log(`Region ${createdRegion} did not exist but was created`);
-            doc = await createdRegion.save()
-        }
-        else doc = docs[0]
-        eventCreationDTO.region = doc._id
-        console.log(doc);
-        console.log();
-        console.log(eventCreationDTO);
-        createdEvent = new this.eventModel(eventCreationDTO);
+        this.prepareForCreation(eventCreationDTO);
+        const createdEvent = new this.eventModel(eventCreationDTO);
         return createdEvent.save();
     }
+
+    /** Create multiple events
+      *  @param eventDict
+      *   Verifies if region exists and create one if not
+      *   TODO (?) - Parse relevant stocks - is this the place or is that a job
+      *     for scrapers ?
+      *
+      * PRE : continent, country, state are in correct form
+      */
+     async createMany(eventDTOArray: EventCreationDTO[]) : Promise<Event[]>{
+      // console.log(eventCreationDTO.detail);
+      // console.log(new this.eventModel(eventCreationDTO));
+      // console.log(new this.regionModel(eventCreationDTO));
+      // console.log(eventCreationDTO.source);
+
+      eventDTOArray.forEach.call(this, this.prepareForCreation); // use .call() to avoid scope problems
+      const createdEvents = this.eventModel.create(eventDTOArray)
+      return createdEvents;
+  }
 
     private validateRegion( toCheck: {
       continent: string, country: string, state: string, city:  string} ) {
@@ -94,7 +127,6 @@ export class EventsService {
         }
 
         return toCheck
-
     }
 
     /** Layer of abstraction between validateRegion & each individual check.

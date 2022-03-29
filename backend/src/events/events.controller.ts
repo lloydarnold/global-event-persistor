@@ -53,6 +53,21 @@ export class EventsController {
     }
   }
 
+  @Post('create-many')
+  async createManyEvents(@Res() response, @Body() eventDTOArray: EventCreationDTO[]) {
+    try {
+      const newEvents = await this.eventsService.createMany(eventDTOArray)
+      return response.status(HttpStatus.CREATED).json({
+        newEvents
+      })
+    } catch (e) {
+        console.error(e)
+        return response.status(HttpStatus.BAD_REQUEST).json({
+            message: e.message
+        })
+    }
+  }
+
   /** Returns an array with every event in the `events` database
    */
   @Get('/get-all')
