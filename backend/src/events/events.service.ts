@@ -84,7 +84,7 @@ export class EventsService {
         }).exec();
     }
 
-    async findEventsInRegion(continent: String, country: String, state: String, city: String): Promise<Event[]> {
+    async findEventsInRegion(continent: String, country: String, state: String, city: String|null): Promise<Event[]> {
         var regionAttributes = {
             continent: continent,
             country: country,
