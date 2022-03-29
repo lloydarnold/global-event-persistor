@@ -23,7 +23,8 @@ export class EventsController {
    *
    * Post JSON fields:
    * @param timeStamp (required): string that can be converted to Date object (e.g. YYYY-MM-DD)
-   * @param sentiment: number between -100 and 100
+   * @param  positivity: Number, number between -100 and 100
+   * @param relevance : Number,
    * @param source (required): source of event, e.g. link to article or post where the event was found
    * @param category (required): category code of the event (see events.model.ts)
    * @param subcategory: string indicating subcategory of the event
@@ -172,7 +173,7 @@ export class EventsController {
       })
   }
 
-  /** general query 
+  /** general query
    *  A generalised query function; allows queries by any parameter that may
    *  otherwise by used.
    */

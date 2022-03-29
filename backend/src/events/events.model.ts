@@ -8,10 +8,10 @@ export const RegionSchema = new mongoose.Schema({
     city : String
 })
 
-// TODO: update to include two numbers under sentiment
 export const EventSchema = new mongoose.Schema({
     timeStamp: { type: Date, required: true },
-    sentiment: Number,
+    positivity: Number,
+    relevance : Number,
     source: { type: String, required: true },
     category: { type: String, required: true },
     subcategory: { type: String },
@@ -24,7 +24,8 @@ export const EventSchema = new mongoose.Schema({
 export interface Event extends mongoose.Document {
     id: mongoose.Schema.Types.ObjectId;
     timeStamp: Date;
-    sentiment: Number;
+    positivity: Number,
+    relevance : Number,
     source: string;
     category: string;
     subcategory: string;
@@ -45,7 +46,8 @@ export interface Region extends mongoose.Document {
 export class EventCreationDTO {
     id: mongoose.Schema.Types.ObjectId;
     timeStamp: Date;
-    sentiment: Number;
+    positivity: Number;
+    relevance : Number;
     source: string;
     category: string;
     subcategory: string;
