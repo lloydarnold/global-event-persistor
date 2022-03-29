@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, Region, EventCreationDTO, QueryDTO } from './events.model';
 import * as CATS from './../res/categories.json';
+import * as CONTS from './../res/continents.json'
 
 @Injectable()
 export class EventsService {
@@ -34,27 +35,34 @@ export class EventsService {
     //     }
     // }
 
-    /**
-     * Create event
-     * @param eventDict
-     *   Verifies if region exists and create one if not
-     *   TODO (?) - Parse relevant stocks - is this the place or is that a job
-     *     for scrapers ?
-     */
+    /** Create event
+      *  @param eventDict
+      *   Verifies if region exists and create one if not
+      *   TODO (?) - Parse relevant stocks - is this the place or is that a job
+      *     for scrapers ?
+      *
+      * PRE : continent, country, state are in correct form
+      */
     async create(eventCreationDTO: EventCreationDTO) : Promise<Event>{
-        console.log(eventCreationDTO.detail)
+        console.log(eventCreationDTO.detail);
         console.log(new this.eventModel(eventCreationDTO));
         console.log(new this.regionModel(eventCreationDTO));
         console.log(this.regionModel);
-        console.log(eventCreationDTO.source)
+        console.log(eventCreationDTO.source);
+
+        var myRegion = {
+          continent: eventCreationDTO.continent,
+          country: eventCreationDTO.country,
+          state: eventCreationDTO.state,
+          city:  eventCreationDTO.city
+        };
+
+        this.validateRegion(myRegion)
 
         const docs = await this.regionModel.find( {
-            continent: eventCreationDTO.continent,
-            country: eventCreationDTO.country,
-            state: eventCreationDTO.state,
-            city:  eventCreationDTO.city
-        }).exec()
-        console.log(docs)
+          myRegion
+        }).exec();
+        console.log(docs);
         var createdEvent = new this.eventModel(eventCreationDTO);
         var doc;
         if (docs.length == 0) {
@@ -69,6 +77,10 @@ export class EventsService {
         createdEvent = new this.eventModel(eventCreationDTO);
         return createdEvent.save();
     }
+
+    private validateRegion( toCheck ) {
+        console.log(toCheck)
+      }
 
     async findAllEvents(): Promise<Event[]> {
         return this.eventModel.find().exec();
