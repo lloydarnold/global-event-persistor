@@ -95,22 +95,23 @@ export class EventsService {
         console.log(regionAttributes)
 
         // delete unspecified fields, thus defaulting to `ALL`
-        Object.keys(regionAttributes).forEach(key => { 
+        Object.keys(regionAttributes).forEach(key => {
             if (regionAttributes[key] == undefined) {
                 delete regionAttributes[key]
             }
         })
 
         const regions = await this.regionModel.find(regionAttributes).exec()
-        
+
         return this.eventModel.find({
             'region': { $in: regions }
         }).exec()
     }
-    
+
     async findEventsOfCategory(cat: String, sub: String ): Promise<Event[]> {
       if ( cat == null ) {
         console.log("Category query with no category");
+        // TODO review if this makes sense or if we should throw an error.
         return this.eventModel.find({}).exec();
       }
 
@@ -162,12 +163,12 @@ export class EventsService {
       console.log(regionAttributes)
 
       // delete unspecified fields, thus defaulting to `ALL`
-      Object.keys(regionAttributes).forEach(key => { 
+      Object.keys(regionAttributes).forEach(key => {
           if (regionAttributes[key] == undefined) {
               delete regionAttributes[key]
           }
       })
-      
+
       if (Object.keys(regionAttributes).length > 0) {
         const regions = await this.regionModel.find(regionAttributes).exec()
         eventsQuery.where('region').in(regions);

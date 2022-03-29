@@ -60,6 +60,9 @@ export class EventsController {
    * Query structure:
    * @param from: beginning of time range, as a Date (or Datetime) string
    * @param to: end of time range (inclusive), as Date (or Datetime) string
+   *
+   * PRE : from, to are both in valid date format
+   * TODO add validation on events format  
    */
   @Get('/get-in-range')
   async fetchEventsInRange(@Res() response, @Query() query: QueryDTO) {
@@ -81,22 +84,38 @@ export class EventsController {
       })
   }
 
+
+  /**
+   *  Query events based on their region.
+   *
+   * API params :
+   * @param continent : String
+   * @param country : String
+   * @param state : String
+   * @param city : String
+   *
+   * PRE : continent, country, state are in ISO standard codes && city is full
+    *      name, without accents ( TODO create accent stripping function )
+   */
   @Get('get-by-region')
   async fetchEventsInRegion(@Res() response, @Query() query: QueryDTO) {
       var events =  await this.eventsService.findEventsInRegion(
                                           query.continent, query.country, query.state, query.city)
 
       return response.status(HttpStatus.OK).json({ events })
-      
+
   }
  /**
   *  Query by category
+  *
+  * API parameters :
   *  @param category : String - category code
   *  @param subcategory : String - subcategory code. If left blank will return
   *    all all events in a category
   *
   *  PRE : subcategory in catCodes.category || subcategory = Null &&
-  *     catCodes.category != Null
+  *     catCodes.category != Null (ie, category exists) || category == null --
+  *                                                         TODO review last condition
   */
   @Get('get-by-category')
   async fetchEventsByCategory(@Res() response, @Query() query: QueryDTO) {
@@ -117,6 +136,16 @@ export class EventsController {
     }
   }
 
+  /**
+   * Query by stock / commodity
+   *
+   * API parameters :
+   * @param stock : String - stock code, using code as traded on relevant market
+   *
+   * PRE : stock is one of the stocks we track
+   *
+   * TODO - add validation
+   */
   @Get('/get-by-stock')
   async fetchByStock(@Res() response, @Query() query: QueryDTO) {
       const events = await this.eventsService.findByStock(query.stock)
@@ -125,6 +154,10 @@ export class EventsController {
       })
   }
 
+  /**
+   *  A generalised query function; allows queries by any parameter that may
+   *  otherwise by used.
+   */
   @Get('get-events')
   async fetchEventsGeneral(@Res() response, @Query() query: QueryDTO) {
     try {
