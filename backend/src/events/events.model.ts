@@ -1,7 +1,5 @@
 import * as mongoose from 'mongoose';
 
-const validCategories = [ 'GEOP', 'CILM', 'ECON', 'CRYP' ]
-
 // empty location == global
 export const RegionSchema = new mongoose.Schema({
     continent : String,
@@ -10,7 +8,7 @@ export const RegionSchema = new mongoose.Schema({
     city : String
 })
 
-// TODO: validation at controller level
+// TODO: update to include two numbers under sentiment
 export const EventSchema = new mongoose.Schema({
     timeStamp: { type: Date, required: true },
     sentiment: Number,
@@ -65,17 +63,12 @@ export class EventCreationDTO {
 
 export class QueryDTO {
     from: Date;
-    to: Date; 
-
+    to: Date;
     continent : string;
     country : string;
-    state: string; // state, province, county, etc; varies
+    state: string;
     city : string;
-
-    // TODO: add category and region options
     category: String;
-    subcategory: String
-    // TODO: add ~category~ and region options
-
+    subcategory: String;
     stock: String
 }

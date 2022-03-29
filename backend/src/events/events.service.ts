@@ -37,9 +37,9 @@ export class EventsService {
     /**
      * Create event
      * @param eventDict
-     * TODO:
-     *   done // - Verify region exists and create one if not
-     *   - Parse relevant stocks
+     *   Verifies if region exists and create one if not
+     *   TODO (?) - Parse relevant stocks - is this the place or is that a job
+     *     for scrapers ?
      */
     async create(eventCreationDTO: EventCreationDTO) : Promise<Event>{
         console.log(eventCreationDTO.detail)

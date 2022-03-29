@@ -62,7 +62,7 @@ export class EventsController {
    * @param to: end of time range (inclusive), as Date (or Datetime) string
    *
    * PRE : from, to are both in valid date format
-   * TODO add validation on events format  
+   * TODO add validation on timestamp format  
    */
   @Get('/get-in-range')
   async fetchEventsInRange(@Res() response, @Query() query: QueryDTO) {

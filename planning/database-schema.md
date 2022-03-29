@@ -63,7 +63,7 @@ Do **not** hard code categories - include in separate file to allow for easy
     is doable
   - also, list can be expanded in future
 - sentiment
-  - TODO - decide how to flesh this out
+  - two entries - goldstein score and positivity 
 
 ### Key Question
 - do we have different tables for each category ?
