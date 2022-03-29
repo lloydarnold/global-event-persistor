@@ -37,11 +37,20 @@ export class EventsController {
    * @param state: administrative region within the country (can be state, province, etc.)
    * @param city: city of the event
    */
+
+  /** Creates new event */
   async createEvent(@Res() response, @Body() eventCreationDTO: EventCreationDTO) {
+    try {
       const newEvent = await this.eventsService.create(eventCreationDTO)
       return response.status(HttpStatus.CREATED).json({
-          newEvent
+        newEvent
       })
+    } catch (e) {
+        console.error(e)
+        return response.status(HttpStatus.BAD_REQUEST).json({
+            message: e.message
+        })
+    }
   }
 
   /** Returns an array with every event in the `events` database

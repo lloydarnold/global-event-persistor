@@ -44,11 +44,10 @@ export class EventsService {
       * PRE : continent, country, state are in correct form
       */
     async create(eventCreationDTO: EventCreationDTO) : Promise<Event>{
-        console.log(eventCreationDTO.detail);
-        console.log(new this.eventModel(eventCreationDTO));
-        console.log(new this.regionModel(eventCreationDTO));
-        console.log(this.regionModel);
-        console.log(eventCreationDTO.source);
+        // console.log(eventCreationDTO.detail);
+        // console.log(new this.eventModel(eventCreationDTO));
+        // console.log(new this.regionModel(eventCreationDTO));
+        // console.log(eventCreationDTO.source);
 
         var myRegion = {
           continent: eventCreationDTO.continent,
@@ -57,30 +56,90 @@ export class EventsService {
           city:  eventCreationDTO.city
         };
 
-        this.validateRegion(myRegion)
+        myRegion = this.validateRegion(myRegion);
 
-        const docs = await this.regionModel.find( {
+        // console.log(myRegion);
+
+        const docs = await this.regionModel.find(
           myRegion
-        }).exec();
-        console.log(docs);
+        ).exec();
+
+        // console.log(docs);
+
         var createdEvent = new this.eventModel(eventCreationDTO);
         var doc;
         if (docs.length == 0) {
-            const createdRegion = new this.regionModel(eventCreationDTO)
+            const createdRegion = new this.regionModel(myRegion)
             console.log(`Region ${createdRegion} did not exist but was created`);
             doc = await createdRegion.save()
         }
         else doc = docs[0]
         eventCreationDTO.region = doc._id
-        console.log(doc)
-        console.log(eventCreationDTO)
+        console.log(doc);
+        console.log();
+        console.log(eventCreationDTO);
         createdEvent = new this.eventModel(eventCreationDTO);
         return createdEvent.save();
     }
 
-    private validateRegion( toCheck ) {
-        console.log(toCheck)
+    private validateRegion( toCheck: {
+      continent: string, country: string, state: string, city:  string} ) {
+
+        for (const [key, value] of Object.entries(toCheck)) {
+          if (toCheck[key] == undefined) {
+              delete toCheck[key]
+          } else {
+            toCheck[key] = this.validateKey(key, value)
+          }
+        }
+
+        return toCheck
+
+    }
+
+    /** Layer of abstraction between validateRegion & each individual check.
+      * Makes it easier to update region in future
+      */
+    private validateKey(key : string, value : string) :string {
+      // TODO finish validation
+      switch(key) {
+        case "continent":
+          // put in try catch
+          return this.fixCont(value);
+        case "country":
+        // put in try catch
+          return this.fixCountry(value);
+        case "state":
+          break;
+        case "city":
+          break;
+        default:
+          //raise error. Invalid key given in region.
       }
+
+      return value
+    }
+
+    /** validate continent codes
+      *
+      * will convert to ISO code from english, approve if already given as code
+      * or complain if not
+      * @param myCont : String the value of the continent code to check
+      */
+    private fixCont(myCont : string) :string {
+      myCont = myCont.trim().toUpperCase();
+
+      for (const [key, value] of Object.entries(CONTS)) {
+          if (myCont == key || myCont == value) { return value };
+      }
+
+      // raise error
+      throw new Error("Invalid Continent")
+    }
+
+    private fixCountry(myCountry : string) :string {
+      return myCountry
+    }
 
     async findAllEvents(): Promise<Event[]> {
         return this.eventModel.find().exec();
