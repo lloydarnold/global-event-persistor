@@ -60,7 +60,7 @@ export class EventsService {
         // console.log(new this.regionModel(eventCreationDTO));
         // console.log(eventCreationDTO.source);
 
-        this.prepareForCreation(eventCreationDTO);
+        await this.prepareForCreation(eventCreationDTO);
         const createdEvent = new this.eventModel(eventCreationDTO);
         return createdEvent.save();
     }
