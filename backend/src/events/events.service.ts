@@ -32,7 +32,7 @@ export class EventsService {
 
       myRegion = this.validateRegion(myRegion);
       // TODO verify if EU / GER / undefined comes up with eg. EU / GER / BAV / MUNICH
-      // we don't want it to !
+      // we don't want it to ! - it does:( -- TODO fix this
       const docs = await this.regionModel.find( myRegion ).exec();
 
       var doc;
