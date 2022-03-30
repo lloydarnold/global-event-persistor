@@ -138,7 +138,7 @@ export class EventsController {
    * @param city : String
    *
    * PRE : continent, country, state are in ISO standard codes && city is full
-    *      name, without accents ( TODO create accent stripping function )
+    *      name, without accents
    */
   @Get('get-by-region')
   async fetchEventsInRegion(@Res() response, @Query() query: QueryDTO) {
