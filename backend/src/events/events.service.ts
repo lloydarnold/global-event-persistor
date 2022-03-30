@@ -142,15 +142,15 @@ export class EventsService {
 
     private fixCountry(myCountry : string) :string {
       myCountry = myCountry.trim().toUpperCase();
+      console.log(myCountry);
 
-      try {
         const name = COUNTCODES[myCountry];
         if ( name ) return myCountry;
-      } catch (e) {
+
         for (const [name, code] of Object.entries(COUNTNAMES)) {
+            console.log(name);
             if (myCountry == name) { return code; }
         }
-      }
 
       throw new Error("Invalid Country")
     }
