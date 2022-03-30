@@ -70,7 +70,7 @@ export class QueryDTO {
     country : string;
     state: string;
     city : string;
-    category: String;
-    subcategory: String;
-    stock: String
+    categories: String[];
+    subcategories: String[];
+    stocks: String[]
 }

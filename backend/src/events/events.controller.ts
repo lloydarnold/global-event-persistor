@@ -173,12 +173,12 @@ export class EventsController {
   */
   @Get('get-by-category')
   async fetchEventsByCategory(@Res() response, @Query() query: QueryDTO) {
-    var cat = query.category;
-    var sub = query.subcategory;
+    var cats = query.categories;
+    var subs = query.subcategories;
 
-    console.log(`Queried events of type : ${cat}, subtype : ${sub}`);
+    console.log(`Queried events of type : ${cats}, subtype : ${subs}`);
     try {
-        const events = await this.eventsService.findEventsOfCategory(cat, sub);
+        const events = await this.eventsService.findEventsOfCategory(cats, subs);
         return response.status(HttpStatus.OK).json({
             events
         })
@@ -201,7 +201,7 @@ export class EventsController {
    */
   @Get('/get-by-stock')
   async fetchByStock(@Res() response, @Query() query: QueryDTO) {
-      const events = await this.eventsService.findByStock(query.stock)
+      const events = await this.eventsService.findByStock(query.stocks)
       return response.status(HttpStatus.OK).json({
           events
       })

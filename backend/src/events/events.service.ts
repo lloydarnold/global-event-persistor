@@ -193,29 +193,35 @@ export class EventsService {
         }).populate('region', '', this.regionModel).exec()
     }
 
-    async findEventsOfCategory(cat: String, sub: String ): Promise<Event[]> {
-      if ( cat == null ) {
-        console.log("Category query with no category");
+    private allSubsHaveCat(cats: Array<String>, subs: Array<String>) {
+      console.log(cats)
+      console.log(subs)
+      return subs.every(sub => { return cats.some(cat => { return CATS[`${cat}`].includes(sub) }) })
+    }
+
+    async findEventsOfCategory(cats: String[], subs: String[] ): Promise<Event[]> {
+      if ( !cats || cats.length == 0 ) {
+        console.log("Category query with no categories");
         // TODO review if this makes sense or if we should throw an error.
         return this.eventModel.find({}).populate('region', '', this.regionModel).exec();
       }
 
-      else if ( sub == null ) {
-        console.log("Category query with no subcategory");
-        return this.eventModel.find({ category: cat }).populate('region', '', this.regionModel).exec();
+      else if ( !subs || subs.length == 0 ) {
+        console.log("Category query with no subcategories");
+        return this.eventModel.find({ category: { $in: cats } }).populate('region', '', this.regionModel).exec();
       }
 
-      if (!(CATS[`${cat}`].includes(sub)))
-        throw new Error("Subcategory does not belong to the given category")
+      if (!this.allSubsHaveCat(cats, subs))
+        throw new Error("Some subcategories does not belong to the given categories")
 
       return this.eventModel.find({
-        category: cat,
-        subcategory : sub,
+        category: { $in: cats },
+        subcategory : { $in: subs },
       }).populate('region', '', this.regionModel).exec();
     }
 
-    async findByStock(stock: String) {
-      return this.eventModel.find({ stocks: stock }).populate('region', '', this.regionModel).exec()
+    async findByStock(stocks: String[]) {
+      return this.eventModel.find({ stocks: { $in: stocks }}).populate('region', '', this.regionModel).exec()
     }
 
     private timeMillis(date: Date) : number {
@@ -225,19 +231,19 @@ export class EventsService {
     async findEventsGeneral(query: QueryDTO) {
       var eventsQuery = this.eventModel.find();
 
-      if (query.stock) eventsQuery.where('stocks').equals(query.stock)
+      if (query.stocks && query.stocks.length > 0) eventsQuery.where('stocks').in(query.stocks)
 
       if (query.from && query.to)
           eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)).lte(this.timeMillis(query.to))
       if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
       if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
 
-      if (query.category) {
-        eventsQuery.where('category').equals(query.category)
-        if (query.subcategory) {
-          if (!(CATS[`${query.category}`].includes(query.subcategory)))
+      if (query.categories && query.categories.length > 0) {
+        eventsQuery.where('category').in(query.categories)
+        if (query.subcategories && query.subcategories.length > 0) {
+          if (!this.allSubsHaveCat(query.categories, query.subcategories))
             throw new Error("Subcategory does not belong to the given category")
-            eventsQuery.where('subcategory').equals(query.subcategory)
+          eventsQuery.where('subcategory').in(query.subcategories)
         }
       }
 
