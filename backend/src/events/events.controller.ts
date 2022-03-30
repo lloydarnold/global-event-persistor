@@ -88,11 +88,21 @@ export class EventsController {
    */
   @Get('/get-in-range')
   async fetchEventsInRange(@Res() response, @Query() query: QueryDTO) {
-      console.log(`Queried events from ${query.from} to ${query.to}`)
-      const events = await this.eventsService.findEventsInRange(query.from, query.to)
-      return response.status(HttpStatus.OK).json({
-          events
-      })
+      const myFrom = query.from;
+      const myTo = query.to;
+
+      console.log(`Queried events from ${myFrom} to ${myTo}`)
+      try {
+        const events = await this.eventsService.findEventsInRange(myFrom, myTo)
+        return response.status(HttpStatus.OK).json({
+            events
+        })
+    } catch (e) {
+      // if error is due to failed casting of date, give a custom error message
+        return response.status(HttpStatus.BAD_REQUEST).json({
+            message: e.message
+        })
+      }
   }
 
   /** Returns every region in the `regions` database.
