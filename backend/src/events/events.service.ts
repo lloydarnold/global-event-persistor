@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { Event, Region, EventCreationDTO, QueryDTO } from './events.model';
 import * as CATS from './../res/categories.json';
 import * as CONTS from './../res/continents.json'
+import * as COUNTCODES from './../res/codesToCountries.json'
+import * as COUNTNAMES from './../res/countriesToCodes.json'
 
 @Injectable()
 export class EventsService {
@@ -139,7 +141,18 @@ export class EventsService {
     }
 
     private fixCountry(myCountry : string) :string {
-      return myCountry
+      myCountry = myCountry.trim().toUpperCase();
+
+      try {
+        const name = COUNTCODES[myCountry];
+        if ( name ) return myCountry;
+      } catch (e) {
+        for (const [name, code] of Object.entries(COUNTNAMES)) {
+            if (myCountry == name) { return code; }
+        }
+      }
+
+      throw new Error("Invalid Country")
     }
 
     async findAllEvents(): Promise<Event[]> {
