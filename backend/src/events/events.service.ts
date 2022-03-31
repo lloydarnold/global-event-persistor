@@ -49,24 +49,25 @@ export class EventsService {
       console.log(eventCreationDTO);
     }
 
-    /** Create event
-      *  @param eventDict
-      *   Verifies if region exists and create one if not
-      *   TODO (?) - Parse relevant stocks - is this the place or is that a job
-      *     for scrapers ?
-      *
-      * PRE : continent, country, state are in correct form
-      */
-    async create(eventCreationDTO: EventCreationDTO) : Promise<Event>{
-        // console.log(eventCreationDTO.detail);
-        // console.log(new this.eventModel(eventCreationDTO));
-        // console.log(new this.regionModel(eventCreationDTO));
-        // console.log(eventCreationDTO.source);
+    // replaced by a call to createMany
+    // /** Create event
+    //   *  @param eventDict
+    //   *   Verifies if region exists and create one if not
+    //   *   TODO (?) - Parse relevant stocks - is this the place or is that a job
+    //   *     for scrapers ?
+    //   *
+    //   * PRE : continent, country, state are in correct form
+    //   */
+    // async create(eventCreationDTO: EventCreationDTO) : Promise<Event>{
+    //     // console.log(eventCreationDTO.detail);
+    //     // console.log(new this.eventModel(eventCreationDTO));
+    //     // console.log(new this.regionModel(eventCreationDTO));
+    //     // console.log(eventCreationDTO.source);
 
-        await this.prepareForCreation(eventCreationDTO);
-        const createdEvent = new this.eventModel(eventCreationDTO);
-        return createdEvent.save();
-    }
+    //     await this.prepareForCreation(eventCreationDTO);
+    //     const createdEvent = new this.eventModel(eventCreationDTO);
+    //     return createdEvent.save();
+    // }
 
     /** Create multiple events
       *  @param eventDict
@@ -76,16 +77,40 @@ export class EventsService {
       *
       * PRE : continent, country, state are in correct form
       */
-     async createMany(eventDTOArray: EventCreationDTO[]) : Promise<Event[]>{
+     async createMany(eventDTOArray: EventCreationDTO[]) : Promise<{ 
+          newEvents: Event[],
+          duplicateEvents: Event[] }> {
       // console.log(eventCreationDTO.detail);
       // console.log(new this.eventModel(eventCreationDTO));
       // console.log(new this.regionModel(eventCreationDTO));
       // console.log(eventCreationDTO.source);
+      console.log(eventDTOArray)
 
       eventDTOArray.forEach.call(this, this.prepareForCreation); // use .call() to avoid scope problems
-      const createdEvents = this.eventModel.create(eventDTOArray)
-      return createdEvents;
-  }
+      const isDuplicate = await Promise.all(eventDTOArray.map(this.checkDuplicate, this))
+      console.log(isDuplicate)
+
+      const nonDuplicates = eventDTOArray.filter(function(value, index, arr) {
+        return !isDuplicate[index]
+      })
+
+      const duplicateEvents = await this.eventModel.find(
+          { '_id' : { $in: (isDuplicate
+                            .filter(x => x !== null)
+                            .map(x => { if (x !== null) return x._id })
+                          ) 
+                    } 
+      }).exec()
+      console.log(nonDuplicates)
+
+      const createdEvents = this.eventModel.create(nonDuplicates)
+
+      return Promise.resolve({ newEvents: await createdEvents, duplicateEvents: await duplicateEvents });
+    }
+
+    async checkDuplicate(eventDTO: EventCreationDTO) {
+      return await this.eventModel.exists(eventDTO)
+    }
 
     private validateRegion( toCheck: {
       continent: string, country: string, state: string, city:  string} ) {

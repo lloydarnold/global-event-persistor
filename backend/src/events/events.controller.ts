@@ -40,25 +40,28 @@ export class EventsController {
 
   /** Creates new event */
   async createEvent(@Res() response, @Body() eventCreationDTO: EventCreationDTO) {
-    try {
-      const newEvent = await this.eventsService.create(eventCreationDTO)
-      return response.status(HttpStatus.CREATED).json({
-        newEvent
-      })
-    } catch (e) {
-        console.error(e)
-        return response.status(HttpStatus.BAD_REQUEST).json({
-            message: e.message
-        })
-    }
+    return this.createManyEvents(response, [eventCreationDTO])
+    // try {
+    //   const ret = await this.eventsService.createMany([eventCreationDTO])
+    //   return response.status(HttpStatus.CREATED).json({
+    //     newEvent: ret.newEvents,
+    //     duplicateEvents: ret.duplicateEvents
+    //   })
+    // } catch (e) {
+    //     console.error(e)
+    //     return response.status(HttpStatus.BAD_REQUEST).json({
+    //         message: e.message
+    //     })
+    // }
   }
 
   @Post('create-many')
   async createManyEvents(@Res() response, @Body() eventDTOArray: EventCreationDTO[]) {
     try {
-      const newEvents = await this.eventsService.createMany(eventDTOArray)
+      const ret = await this.eventsService.createMany(eventDTOArray)
       return response.status(HttpStatus.CREATED).json({
-        newEvents
+        newEvent: ret.newEvents,
+        duplicateEvents: ret.duplicateEvents
       })
     } catch (e) {
         console.error(e)
