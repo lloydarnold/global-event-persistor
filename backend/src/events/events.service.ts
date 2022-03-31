@@ -190,9 +190,12 @@ export class EventsService {
     }
 
     async findEventsInRange(from: Date, to: Date): Promise<Event[]> {
-        return this.eventModel.find({
-            timeStamp: { $gte: from, $lte: to }
-        }).populate('region', '', this.regionModel).exec();
+      var myObj = new QueryDTO;
+      myObj.from = from;
+      myObj.to = to;
+
+      return await this.findEventsGeneral( myObj )
+
     }
 
     async findEventsInRegion(continent: string, country: string, state: string, city: string): Promise<Event[]> {
