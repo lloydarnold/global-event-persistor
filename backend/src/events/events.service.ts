@@ -115,7 +115,7 @@ export class EventsService {
         case "state":
           break;
         case "city":
-          break;
+          return this.fixCity(value)
         default:
           //raise error. Invalid key given in region.
       }
@@ -155,6 +155,32 @@ export class EventsService {
       throw new Error("Invalid Country")
     }
 
+    /** Take a string, strip it of characters not in the Latin alphabet,
+     *  convert to upper case
+     *
+     * @param toStrip : String string to be stripped and converted
+     */
+    private stripAccentsToUpper(toStrip: string) :string {
+      var r = toStrip.toLowerCase()
+      r = r.replace(new RegExp(/\s/g),"");
+      r = r.replace(new RegExp(/[àáâãäå]/g),"a");
+      r = r.replace(new RegExp(/æ/g),"ae");
+      r = r.replace(new RegExp(/ç/g),"c");
+      r = r.replace(new RegExp(/[èéêë]/g),"e");
+      r = r.replace(new RegExp(/[ìíîï]/g),"i");
+      r = r.replace(new RegExp(/ñ/g),"n");
+      r = r.replace(new RegExp(/[òóôõö]/g),"o");
+      r = r.replace(new RegExp(/œ/g),"oe");
+      r = r.replace(new RegExp(/[ùúûü]/g),"u");
+      r = r.replace(new RegExp(/[ýÿ]/g),"y");
+      r = r.replace(new RegExp(/\W/g),"");
+      return r.toUpperCase()
+    }
+
+    private fixCity(myCity : string) :string {
+      return this.stripAccentsToUpper(myCity)
+    }
+
     async findAllEvents(): Promise<Event[]> {
         return this.eventModel.find().populate('region', '', this.regionModel).exec();
     }
@@ -169,28 +195,16 @@ export class EventsService {
         }).populate('region', '', this.regionModel).exec();
     }
 
-    async findEventsInRegion(continent: String, country: String, state: String, city: String|null): Promise<Event[]> {
-        var regionAttributes = {
-            continent: continent,
-            country: country,
-            state: state,
-            city: city,
-        }
+    async findEventsInRegion(continent: string, country: string, state: string, city: string): Promise<Event[]> {
 
-        console.log(regionAttributes)
+      var myObj = new QueryDTO;
+      myObj.continent = continent;
+      myObj.country = country;
+      myObj.state = state;
+      myObj.city = city;
 
-        // delete unspecified fields, thus defaulting to `ALL`
-        Object.keys(regionAttributes).forEach(key => {
-            if (regionAttributes[key] == undefined) {
-                delete regionAttributes[key]
-            }
-        })
+      return await this.findEventsGeneral( myObj )
 
-        const regions = await this.regionModel.find(regionAttributes).exec()
-
-        return this.eventModel.find({
-            'region': { $in: regions }
-        }).populate('region', '', this.regionModel).exec()
     }
 
     private allSubsHaveCat(cats: Array<String>, subs: Array<String>) {
