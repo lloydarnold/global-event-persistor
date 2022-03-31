@@ -232,7 +232,7 @@ export class EventsService {
     }
 
     private toArr( toConvert : String[]) : String[] {
-      return toConvert.toString().replace("/[^\w\s]/gi","").split(" ")
+      return toConvert.toString().replace(/[^a-zA-Z0-9 ]/g, "").split(" ")
     }
 
     async findEventsGeneral(query: QueryDTO) {
@@ -240,20 +240,34 @@ export class EventsService {
 
       if (query.stocks && query.stocks.length > 0) {
         eventsQuery.where('stocks').in(this.toArr(query.stocks));
-      }
+      };
 
-      if (query.from && query.to)
-          eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)).lte(this.timeMillis(query.to))
-      if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
-      if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
+      if (query.from && query.to) {
+          eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)
+            ).lte(this.timeMillis(query.to))
+        };
+
+      if (query.from) {
+        eventsQuery.where('timeStamp').gte(this.timeMillis(query.from));
+      };
+
+      if (query.to) {
+        eventsQuery.where('timeStamp').lte(this.timeMillis(query.to));
+      };
 
       if (query.categories && query.categories.length > 0) {
-        eventsQuery.where('category').in(query.categories)
+        const myCats = this.toArr( query.categories )
+
+        eventsQuery.where('category').in(myCats);
+
         if (query.subcategories && query.subcategories.length > 0) {
-          if (!this.allSubsHaveCat(query.categories, query.subcategories))
+          const mySubs = this.toArr( query.subcategories )
+          if (!this.allSubsHaveCat(myCats, mySubs)) {
             throw new Error("Subcategory does not belong to the given category")
-          eventsQuery.where('subcategory').in(query.subcategories)
+          };
+          eventsQuery.where('subcategory').in(mySubs);
         }
+
       }
 
       var regionAttributes = {
