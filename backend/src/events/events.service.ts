@@ -7,6 +7,8 @@ import * as CONTS from './../res/continents.json'
 import * as COUNTCODES from './../res/codesToCountries.json'
 import * as COUNTNAMES from './../res/countriesToCodes.json'
 import * as COUNTCONT from './../res/countriesToConts.json'
+import * as SUBCOUNT from './../res/subdivisionToCountry.json'
+import * as SUBNAMECODE from './../res/subdivisionNameToCode.json'
 
 @Injectable()
 export class EventsService {
@@ -46,7 +48,8 @@ export class EventsService {
       }
       else doc = docs[0]
       eventCreationDTO.region = doc._id
-      console.log(eventCreationDTO);
+      // console.log(eventCreationDTO);
+      return eventCreationDTO
     }
 
     // replaced by a call to createMany
@@ -84,11 +87,11 @@ export class EventsService {
       // console.log(new this.eventModel(eventCreationDTO));
       // console.log(new this.regionModel(eventCreationDTO));
       // console.log(eventCreationDTO.source);
-      console.log(eventDTOArray)
+      //console.log(eventDTOArray)
 
-      eventDTOArray.forEach.call(this, this.prepareForCreation); // use .call() to avoid scope problems
+      eventDTOArray = await Promise.all(eventDTOArray.map(this.prepareForCreation, this)); // use .call() to avoid scope problems
       const isDuplicate = await Promise.all(eventDTOArray.map(this.checkDuplicate, this))
-      console.log(isDuplicate)
+      //console.log(isDuplicate)
 
       const nonDuplicates = eventDTOArray.filter(function(value, index, arr) {
         return !isDuplicate[index]
@@ -100,8 +103,10 @@ export class EventsService {
                             .map(x => { if (x !== null) return x._id })
                           ) 
                     } 
-      }).exec()
-      console.log(nonDuplicates)
+      }).populate('region', '', this.regionModel).exec()
+
+      await this.regionModel.populate(nonDuplicates, { path: 'region' })
+      //console.log(nonDuplicates)
 
       const createdEvents = this.eventModel.create(nonDuplicates)
 
@@ -129,7 +134,21 @@ export class EventsService {
             throw new Error('Country is not in the given continent')
         }
 
+        if (Object.keys(toCheck).includes('state')) {
+          //console.log(toCheck)
+          toCheck['state'] = this.fixSubdiv(toCheck['state'], toCheck['country'])
+          //console.log(toCheck)
+        }
+
         return toCheck
+    }
+
+    private trimToUpperNoAccents(s: string) : string {
+      return  (s
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .toUpperCase())
     }
 
     /** Layer of abstraction between validateRegion & each individual check.
@@ -145,7 +164,7 @@ export class EventsService {
         // put in try catch
           return this.fixCountry(value);
         case "state":
-          break;
+          break; // subdivision needs to be handles separately
         case "city":
           return this.fixCity(value)
         default:
@@ -173,18 +192,51 @@ export class EventsService {
     }
 
     private fixCountry(myCountry : string) :string {
-      myCountry = myCountry.trim().toUpperCase();
+      myCountry = this.trimToUpperNoAccents(myCountry);
       console.log(myCountry);
 
-        const name = COUNTCODES[myCountry];
-        if ( name ) return myCountry;
+      const name = COUNTCODES[myCountry];
+      if ( name ) return myCountry;
 
-        for (const [name, code] of Object.entries(COUNTNAMES)) {
-            console.log(name);
-            if (myCountry == name) { return code; }
-        }
+      for (const [name, code] of Object.entries(COUNTNAMES)) {
+          //console.log(name);
+          if (myCountry == name) { return code; }
+      }
 
       throw new Error("Invalid Country")
+    }
+
+    private fixSubdiv(mySubdiv: string, myCountryCode: string) : string {
+      if (!myCountryCode) {
+        throw new Error("Need to specify country to query by state")
+      }
+
+      mySubdiv = this.trimToUpperNoAccents(mySubdiv)
+      //console.log(mySubdiv);
+
+      const countrySubdivs = SUBCOUNT[`${myCountryCode}`]
+
+      if (countrySubdivs && countrySubdivs.includes(mySubdiv) )
+        return mySubdiv
+
+      const subdivs = SUBNAMECODE[`${mySubdiv}`];
+
+      if ( !subdivs ) {
+        //console.log(subdivs)
+        throw new Error("Subdivision does not exist in any country");
+      }
+
+      if (!subdivs.map(x => x.country).includes(myCountryCode)) {
+        //console.log(subdivs)
+        throw new Error("Subdivision does not exist in the given country");
+      }
+
+      const subdivCode = (subdivs
+                            .filter(x => x.country == myCountryCode)[0]
+                            .code);
+      
+      return subdivCode;
+
     }
 
     /** Take a string, strip it of characters not in the Latin alphabet,
@@ -314,7 +366,7 @@ export class EventsService {
         state: query.state,
         city: query.city,
       })
-      console.log(regionAttributes)
+      //console.log(regionAttributes)
 
       // delete unspecified fields, thus defaulting to `ALL`
       Object.keys(regionAttributes).forEach(key => {
