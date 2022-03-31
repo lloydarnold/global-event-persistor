@@ -193,7 +193,7 @@ export class EventsController {
  /** Query by stock / commodity
    *
    * API parameters :
-   * @param stock : String - stock code, using code as traded on relevant market
+   * @param stocks : String - stock code, using code as traded on relevant market
    *
    * PRE : stock is one of the stocks we track
    *

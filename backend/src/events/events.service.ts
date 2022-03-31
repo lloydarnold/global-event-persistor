@@ -221,7 +221,10 @@ export class EventsService {
     }
 
     async findByStock(stocks: String[]) {
-      return this.eventModel.find({ stocks: { $in: stocks }}).populate('region', '', this.regionModel).exec()
+      var myObj = new QueryDTO;
+      myObj.stocks = stocks
+
+      return await this.findEventsGeneral( myObj )
     }
 
     private timeMillis(date: Date) : number {
@@ -253,7 +256,6 @@ export class EventsService {
         state: query.state,
         city: query.city,
       }
-      console.log(regionAttributes)
 
       // delete unspecified fields, thus defaulting to `ALL`
       Object.keys(regionAttributes).forEach(key => {
