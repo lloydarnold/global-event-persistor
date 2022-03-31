@@ -200,24 +200,11 @@ export class EventsService {
     }
 
     async findEventsOfCategory(cats: String[], subs: String[] ): Promise<Event[]> {
-      if ( !cats || cats.length == 0 ) {
-        console.log("Category query with no categories");
-        // TODO review if this makes sense or if we should throw an error.
-        return this.eventModel.find({}).populate('region', '', this.regionModel).exec();
-      }
+      var myObj = new QueryDTO;
+      myObj.categories = cats;
+      myObj.subcategories = subs;
 
-      else if ( !subs || subs.length == 0 ) {
-        console.log("Category query with no subcategories");
-        return this.eventModel.find({ category: { $in: cats } }).populate('region', '', this.regionModel).exec();
-      }
-
-      if (!this.allSubsHaveCat(cats, subs))
-        throw new Error("Some subcategories does not belong to the given categories")
-
-      return this.eventModel.find({
-        category: { $in: cats },
-        subcategory : { $in: subs },
-      }).populate('region', '', this.regionModel).exec();
+      return await this.findEventsGeneral( myObj )
     }
 
     async findByStock(stocks: String[]) {
