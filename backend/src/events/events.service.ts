@@ -122,7 +122,7 @@ export class EventsService {
         case "state":
           break;
         case "city":
-          break;
+          return this.fixCity(value)
         default:
           //raise error. Invalid key given in region.
       }
@@ -162,6 +162,32 @@ export class EventsService {
       throw new Error("Invalid Country")
     }
 
+    /** Take a string, strip it of characters not in the Latin alphabet,
+     *  convert to upper case
+     *
+     * @param toStrip : String string to be stripped and converted
+     */
+    private stripAccentsToUpper(toStrip: string) :string {
+      var r = toStrip.toLowerCase()
+      r = r.replace(new RegExp(/\s/g),"");
+      r = r.replace(new RegExp(/[àáâãäå]/g),"a");
+      r = r.replace(new RegExp(/æ/g),"ae");
+      r = r.replace(new RegExp(/ç/g),"c");
+      r = r.replace(new RegExp(/[èéêë]/g),"e");
+      r = r.replace(new RegExp(/[ìíîï]/g),"i");
+      r = r.replace(new RegExp(/ñ/g),"n");
+      r = r.replace(new RegExp(/[òóôõö]/g),"o");
+      r = r.replace(new RegExp(/œ/g),"oe");
+      r = r.replace(new RegExp(/[ùúûü]/g),"u");
+      r = r.replace(new RegExp(/[ýÿ]/g),"y");
+      r = r.replace(new RegExp(/\W/g),"");
+      return r.toUpperCase()
+    }
+
+    private fixCity(myCity : string) :string {
+      return this.stripAccentsToUpper(myCity)
+    }
+
     async findAllEvents(): Promise<Event[]> {
         return this.eventModel.find().populate('region', '', this.regionModel).exec();
     }
@@ -171,33 +197,24 @@ export class EventsService {
     }
 
     async findEventsInRange(from: Date, to: Date): Promise<Event[]> {
-        return this.eventModel.find({
-            timeStamp: { $gte: from, $lte: to }
-        }).populate('region', '', this.regionModel).exec();
+      var myObj = new QueryDTO;
+      myObj.from = from;
+      myObj.to = to;
+
+      return await this.findEventsGeneral( myObj )
+
     }
 
     async findEventsInRegion(continent: string, country: string, state: string, city: string): Promise<Event[]> {
-        var regionAttributes = this.validateRegion({
-            continent: continent,
-            country: country,
-            state: state,
-            city: city,
-        })
 
-        console.log(regionAttributes)
+      var myObj = new QueryDTO;
+      myObj.continent = continent;
+      myObj.country = country;
+      myObj.state = state;
+      myObj.city = city;
 
-        // delete unspecified fields, thus defaulting to `ALL`
-        Object.keys(regionAttributes).forEach(key => {
-            if (regionAttributes[key] == undefined) {
-                delete regionAttributes[key]
-            }
-        })
+      return await this.findEventsGeneral( myObj )
 
-        const regions = await this.regionModel.find(regionAttributes).exec()
-
-        return this.eventModel.find({
-            'region': { $in: regions }
-        }).populate('region', '', this.regionModel).exec()
     }
 
     private allSubsHaveCat(cats: Array<String>, subs: Array<String>) {
@@ -206,52 +223,64 @@ export class EventsService {
       return subs.every(sub => { return cats.some(cat => { return CATS[`${cat}`].includes(sub) }) })
     }
 
-    async findEventsOfCategory(cats: String[], subs: String[] ): Promise<Event[]> {
-      if ( !cats || cats.length == 0 ) {
-        console.log("Category query with no categories");
-        // TODO review if this makes sense or if we should throw an error.
-        return this.eventModel.find({}).populate('region', '', this.regionModel).exec();
-      }
+    async findEventsOfCategory(cats: string[], subs: string[] ): Promise<Event[]> {
+      var myObj = new QueryDTO;
+      myObj.categories = cats;
+      myObj.subcategories = subs;
 
-      else if ( !subs || subs.length == 0 ) {
-        console.log("Category query with no subcategories");
-        return this.eventModel.find({ category: { $in: cats } }).populate('region', '', this.regionModel).exec();
-      }
-
-      if (!this.allSubsHaveCat(cats, subs))
-        throw new Error("Some subcategories does not belong to the given categories")
-
-      return this.eventModel.find({
-        category: { $in: cats },
-        subcategory : { $in: subs },
-      }).populate('region', '', this.regionModel).exec();
+      return await this.findEventsGeneral( myObj )
     }
 
-    async findByStock(stocks: String[]) {
-      return this.eventModel.find({ stocks: { $in: stocks }}).populate('region', '', this.regionModel).exec()
+    async findByStock(stocks: string[]) {
+      var myObj = new QueryDTO;
+      myObj.stocks = stocks
+
+      return await this.findEventsGeneral( myObj )
     }
 
     private timeMillis(date: Date) : number {
       return new Date(date).getTime()
     }
 
+    private toArr( toConvert : string[]) : string[] {
+      return toConvert.map(s => { return s.toString().replace(/[^a-zA-Z0-9 ]/g, "") })
+    }
+
     async findEventsGeneral(query: QueryDTO) {
       var eventsQuery = this.eventModel.find();
 
-      if (query.stocks && query.stocks.length > 0) eventsQuery.where('stocks').in(query.stocks)
+      if (query.stocks && query.stocks.length > 0) {
+        eventsQuery.where('stocks').in(this.toArr(query.stocks));
+      };
 
-      if (query.from && query.to)
-          eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)).lte(this.timeMillis(query.to))
-      if (query.from) eventsQuery.where('timeStamp').gte(this.timeMillis(query.from))
-      if (query.to) eventsQuery.where('timeStamp').lte(this.timeMillis(query.to))
+      if (query.from && query.to) {
+          eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)
+            ).lte(this.timeMillis(query.to))
+        };
 
+      if (query.from) {
+        eventsQuery.where('timeStamp').gte(this.timeMillis(query.from));
+      };
+
+      if (query.to) {
+        eventsQuery.where('timeStamp').lte(this.timeMillis(query.to));
+      };
+
+      // investigate if this causes logic error in case there's an empty
+      // subcategory halfway through array -- think maybe yes? TODO
       if (query.categories && query.categories.length > 0) {
-        eventsQuery.where('category').in(query.categories)
+        const myCats = this.toArr( query.categories )
+
+        eventsQuery.where('category').in(myCats);
+
         if (query.subcategories && query.subcategories.length > 0) {
-          if (!this.allSubsHaveCat(query.categories, query.subcategories))
+          const mySubs = this.toArr( query.subcategories )
+          if (!this.allSubsHaveCat(myCats, mySubs)) {
             throw new Error("Subcategory does not belong to the given category")
-          eventsQuery.where('subcategory').in(query.subcategories)
+          };
+          eventsQuery.where('subcategory').in(mySubs);
         }
+
       }
 
       var regionAttributes = this.validateRegion({

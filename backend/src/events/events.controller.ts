@@ -164,9 +164,12 @@ export class EventsController {
 /** Query by category
   *
   * API parameters :
-  *  @param category : String - category code
-  *  @param subcategory : String - subcategory code. If left blank will return
+  *  @param category : String[] - category codes
+  *  @param subcategory : String[] - subcategory codes. If left blank will return
   *    all all events in a category
+  *
+  *  can pass data either as category = [cat1, cat2] etc. OR as
+  *   category[0] = cat1, category[1] = cat1
   *
   *  PRE : subcategory in catCodes.category || subcategory = Null &&
   *     catCodes.category != Null (ie, category exists) || category == null --
@@ -194,7 +197,7 @@ export class EventsController {
  /** Query by stock / commodity
    *
    * API parameters :
-   * @param stock : String - stock code, using code as traded on relevant market
+   * @param stocks : String - stock code, using code as traded on relevant market
    *
    * PRE : stock is one of the stocks we track
    *
