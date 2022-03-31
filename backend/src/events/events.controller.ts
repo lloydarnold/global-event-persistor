@@ -121,8 +121,8 @@ export class EventsController {
    *
    * @param toStrip : String string to be stripped and converted
    */
-  private stripAccentsToUpper(toStrip: String) :String|null {
-    if (toStrip == null) { return null }
+  private stripAccentsToUpper(toStrip: string) :string {
+    require(toStrip) // if (toStrip == null) { return null }
     var r = toStrip.toLowerCase()
     r = r.replace(new RegExp(/\s/g),"");
     r = r.replace(new RegExp(/[àáâãäå]/g),"a");
@@ -152,9 +152,10 @@ export class EventsController {
    */
   @Get('get-by-region')
   async fetchEventsInRegion(@Res() response, @Query() query: QueryDTO) {
+      const city: string = query.city ? this.stripAccentsToUpper(query.city) : query.city
       var events =  await this.eventsService.findEventsInRegion(
                                           query.continent, query.country, query.state,
-                                          this.stripAccentsToUpper(query.city))
+                                          city)
 
       return response.status(HttpStatus.OK).json({ events })
 

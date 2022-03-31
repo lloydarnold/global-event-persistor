@@ -6,6 +6,7 @@ import * as CATS from './../res/categories.json';
 import * as CONTS from './../res/continents.json'
 import * as COUNTCODES from './../res/codesToCountries.json'
 import * as COUNTNAMES from './../res/countriesToCodes.json'
+import * as COUNTCONT from './../res/countriesToConts.json'
 
 @Injectable()
 export class EventsService {
@@ -90,11 +91,17 @@ export class EventsService {
       continent: string, country: string, state: string, city:  string} ) {
 
         for (const [key, value] of Object.entries(toCheck)) {
-          if (toCheck[key] == undefined) {
+          if (!toCheck[key] || toCheck[key].length == 0) {
               delete toCheck[key]
           } else {
             toCheck[key] = this.validateKey(key, value)
           }
+        }
+
+        if (Object.keys(toCheck).includes('continent') && 
+              Object.keys(toCheck).includes('country')) {
+          if (!COUNTCONT[`${toCheck.country}`].includes(toCheck.continent)) 
+            throw new Error('Country is not in the given continent')
         }
 
         return toCheck
@@ -169,13 +176,13 @@ export class EventsService {
         }).populate('region', '', this.regionModel).exec();
     }
 
-    async findEventsInRegion(continent: String, country: String, state: String, city: String|null): Promise<Event[]> {
-        var regionAttributes = {
+    async findEventsInRegion(continent: string, country: string, state: string, city: string): Promise<Event[]> {
+        var regionAttributes = this.validateRegion({
             continent: continent,
             country: country,
             state: state,
             city: city,
-        }
+        })
 
         console.log(regionAttributes)
 
@@ -247,12 +254,12 @@ export class EventsService {
         }
       }
 
-      var regionAttributes = {
+      var regionAttributes = this.validateRegion({
         continent: query.continent,
         country: query.country,
         state: query.state,
         city: query.city,
-      }
+      })
       console.log(regionAttributes)
 
       // delete unspecified fields, thus defaulting to `ALL`
