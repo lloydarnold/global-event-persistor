@@ -242,6 +242,8 @@ export class EventsService {
         eventsQuery.where('timeStamp').lte(this.timeMillis(query.to));
       };
 
+      // investigate if this causes logic error in case there's an empty
+      // subcategory halfway through array -- think maybe yes? TODO
       if (query.categories && query.categories.length > 0) {
         const myCats = this.toArr( query.categories )
 
