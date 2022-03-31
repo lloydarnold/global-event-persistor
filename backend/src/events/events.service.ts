@@ -231,10 +231,16 @@ export class EventsService {
       return new Date(date).getTime()
     }
 
+    private toArr( toConvert : String[]) : String[] {
+      return toConvert.toString().replace("/[^\w\s]/gi","").split(" ")
+    }
+
     async findEventsGeneral(query: QueryDTO) {
       var eventsQuery = this.eventModel.find();
 
-      if (query.stocks && query.stocks.length > 0) eventsQuery.where('stocks').in(query.stocks)
+      if (query.stocks && query.stocks.length > 0) {
+        eventsQuery.where('stocks').in(this.toArr(query.stocks));
+      }
 
       if (query.from && query.to)
           eventsQuery.where('timeStamp').gte(this.timeMillis(query.from)).lte(this.timeMillis(query.to))
