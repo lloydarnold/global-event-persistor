@@ -62,6 +62,10 @@ r = requests.post('http://localhost:3000/events', json=  {
     "category": entryList[4],
     "subcategory": entryList[5],
     "detail": entryList[6],
+    "continent": "Europe",
+    "country": "GE",
+    "state" : "Bavaria",
+    "city" : "Munich",
     "actors": entryList[8],
     "stocks": entryList[9]
     })
