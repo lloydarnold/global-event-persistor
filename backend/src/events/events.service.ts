@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Event, Region, EventCreationDTO, QueryDTO } from './events.model';
+import { Event, Region, EventCreationDTO, RegionCreationDTO, QueryDTO } from './events.model';
 import * as CATS from './../res/categories.json';
 import * as CONTS from './../res/continents.json'
 import * as COUNTCODES from './../res/codesToCountries.json'
@@ -9,6 +9,7 @@ import * as COUNTNAMES from './../res/countriesToCodes.json'
 import * as COUNTCONT from './../res/countriesToConts.json'
 import * as SUBCOUNT from './../res/subdivisionToCountry.json'
 import * as SUBNAMECODE from './../res/subdivisionNameToCode.json'
+import { create } from 'domain';
 
 @Injectable()
 export class EventsService {
@@ -27,30 +28,84 @@ export class EventsService {
       *
       * PRE : continent, country, state are in correct form
       */
-    private async prepareForCreation(eventCreationDTO: EventCreationDTO) {
-      var myRegion = {
-        continent: eventCreationDTO.continent,
-        country: eventCreationDTO.country,
-        state: eventCreationDTO.state,
-        city:  eventCreationDTO.city
-      };
 
-      myRegion = this.validateRegion(myRegion);
-      // TODO verify if EU / GER / undefined comes up with eg. EU / GER / BAV / MUNICH
-      // we don't want it to ! - it does:( -- TODO fix this
-      const docs = await this.regionModel.find( myRegion ).exec();
+    private async prepareManyForCreation(eventArray: EventCreationDTO[]) {
+      const regionsStrings = new Map();
+      const regionsIds = new Map()
 
-      var doc;
-      if (docs.length == 0) {
-          const createdRegion = new this.regionModel(myRegion)
-          console.log(`Region ${createdRegion} did not exist but was created`);
-          doc = await createdRegion.save()
+      // remove duplicates of regions using stringify
+      for (const event of eventArray) {
+        event.eventRegions = event.eventRegions.map(reg => {
+          const vReg = this.validateRegion(reg); 
+          const sReg = JSON.stringify(vReg);
+          regionsStrings.set(sReg, vReg);
+          return vReg
+        }, this)
       }
-      else doc = docs[0]
-      eventCreationDTO.region = doc._id
-      // console.log(eventCreationDTO);
-      return eventCreationDTO
+
+      // use array of promises to send requests in parammem
+      await Promise.all(Array.from(regionsStrings, async ([sReg, region]) => {
+        // check if region is in database
+        const idIfExists = await this.regionModel.exists(region)
+
+        // if yes, store into map
+        if (idIfExists) {
+          // console.log(idIfExists)
+          regionsIds.set(sReg, idIfExists._id)
+        } else { // if not, create region
+          const createdRegion = new this.regionModel(region)
+
+          console.log(`Region ${createdRegion} did not exist but was created`);
+          await createdRegion.save();
+
+          regionsIds.set(sReg, createdRegion._id)
+          // console.log(regionsIds.get(sReg))
+        }
+      }))
+
+      // console.log(regionsIds)
+
+      // match regions of each event with respective id
+      for (const event of eventArray) {
+        event.regions = []
+        for (const reg of event.eventRegions) {
+          const sReg = JSON.stringify(reg)
+          event.regions.push(regionsIds.get(sReg))
+        }
+        // console.log(event.regions)
+      }
+
+      // console.log(eventArray)
+
+      return eventArray
+
     }
+
+    // private async prepareForCreation(eventCreationDTO: EventCreationDTO) {
+    //   eventCreationDTO.regions = []
+    //   var myRegion = {
+    //     continent: eventCreationDTO.continent,
+    //     country: eventCreationDTO.country,
+    //     state: eventCreationDTO.state,
+    //     city:  eventCreationDTO.city
+    //   };
+
+    //   myRegion = this.validateRegion(myRegion);
+    //   // TODO verify if EU / GER / undefined comes up with eg. EU / GER / BAV / MUNICH
+    //   // we don't want it to ! - it does:( -- TODO fix this
+    //   const docs = await this.regionModel.find( myRegion ).exec();
+
+    //   var doc;
+    //   if (docs.length == 0) {
+    //       const createdRegion = new this.regionModel(myRegion)
+    //       console.log(`Region ${createdRegion} did not exist but was created`);
+    //       doc = await createdRegion.save()
+    //   }
+    //   else doc = docs[0]
+    //   eventCreationDTO.region = doc._id
+    //   // console.log(eventCreationDTO);
+    //   return eventCreationDTO
+    // }
 
     // replaced by a call to createMany
     // /** Create event
@@ -89,7 +144,7 @@ export class EventsService {
       // console.log(eventCreationDTO.source);
       //console.log(eventDTOArray)
 
-      eventDTOArray = await Promise.all(eventDTOArray.map(this.prepareForCreation, this)); // use .call() to avoid scope problems
+      eventDTOArray = await this.prepareManyForCreation(eventDTOArray) // await Promise.all(eventDTOArray.map(this.prepareForCreation, this)); // use .call() to avoid scope problems
       const isDuplicate = await Promise.all(eventDTOArray.map(this.checkDuplicate, this))
       //console.log(isDuplicate)
 
@@ -103,10 +158,11 @@ export class EventsService {
                             .map(x => { if (x !== null) return x._id })
                           ) 
                     } 
-      }).populate('region', '', this.regionModel).exec()
-
-      await this.regionModel.populate(nonDuplicates, { path: 'region' })
-      //console.log(nonDuplicates)
+      }).populate('regions', '', this.regionModel).exec()
+      
+      // console.log(nonDuplicates.map(x => x.regions))
+      await this.regionModel.populate(nonDuplicates, { path: 'regions' })
+      // console.log(nonDuplicates)
 
       const createdEvents = this.eventModel.create(nonDuplicates)
 
@@ -266,7 +322,7 @@ export class EventsService {
     }
 
     async findAllEvents(): Promise<Event[]> {
-        return this.eventModel.find().populate('region', '', this.regionModel).exec();
+        return this.eventModel.find().populate('regions', '', this.regionModel).exec();
     }
 
     async findAllRegions(): Promise<Region[]> {
@@ -377,9 +433,9 @@ export class EventsService {
 
       if (Object.keys(regionAttributes).length > 0) {
         const regions = await this.regionModel.find(regionAttributes).exec()
-        eventsQuery.where('region').in(regions);
+        eventsQuery.where('regions').in(regions);
       }
 
-      return eventsQuery.populate('region', '', this.regionModel).exec()
+      return eventsQuery.populate('regions', '', this.regionModel).exec()
     }
 }

@@ -24,7 +24,7 @@ export const EventSchema = new mongoose.Schema({
     category: { type: String, required: true },
     subcategory: { type: String },
     detail : String,
-    region : { type: mongoose.Schema.Types.ObjectId, ref: 'Region'},
+    regions : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Region'}],
     actors : [String],
     stocks : [String]
 })
@@ -38,9 +38,16 @@ export interface Event extends mongoose.Document {
     category: string;
     subcategory: string;
     detail: string;
-    region: { type: mongoose.Schema.Types.ObjectId, ref: 'Region'};
+    regions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Region'}];
     actors: string[];
     stocks: string[]
+}
+
+export class RegionCreationDTO {
+    continent : string;
+    country : string;
+    state: string; // state, province, county, etc; varies
+    city : string;
 }
 
 export class EventCreationDTO {
@@ -52,15 +59,11 @@ export class EventCreationDTO {
     category: string;
     subcategory: string;
     detail: string;
-    region: mongoose.Schema.Types.ObjectId;
+    regions: mongoose.Schema.Types.ObjectId[];
     actors: string[];
     stocks: string[]
 
-    id_reg: mongoose.Schema.Types.ObjectId;
-    continent : string;
-    country : string;
-    state: string; // state, province, county, etc; varies
-    city : string;
+    eventRegions: RegionCreationDTO[]
 }
 
 export class QueryDTO {
