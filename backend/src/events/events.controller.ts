@@ -40,25 +40,28 @@ export class EventsController {
 
   /** Creates new event */
   async createEvent(@Res() response, @Body() eventCreationDTO: EventCreationDTO) {
-    try {
-      const newEvent = await this.eventsService.create(eventCreationDTO)
-      return response.status(HttpStatus.CREATED).json({
-        newEvent
-      })
-    } catch (e) {
-        console.error(e)
-        return response.status(HttpStatus.BAD_REQUEST).json({
-            message: e.message
-        })
-    }
+    return this.createManyEvents(response, [eventCreationDTO])
+    // try {
+    //   const ret = await this.eventsService.createMany([eventCreationDTO])
+    //   return response.status(HttpStatus.CREATED).json({
+    //     newEvent: ret.newEvents,
+    //     duplicateEvents: ret.duplicateEvents
+    //   })
+    // } catch (e) {
+    //     console.error(e)
+    //     return response.status(HttpStatus.BAD_REQUEST).json({
+    //         message: e.message
+    //     })
+    // }
   }
 
   @Post('create-many')
   async createManyEvents(@Res() response, @Body() eventDTOArray: EventCreationDTO[]) {
     try {
-      const newEvents = await this.eventsService.createMany(eventDTOArray)
+      const ret = await this.eventsService.createMany(eventDTOArray)
       return response.status(HttpStatus.CREATED).json({
-        newEvents
+        newEvent: ret.newEvents,
+        duplicateEvents: ret.duplicateEvents
       })
     } catch (e) {
         console.error(e)
@@ -121,8 +124,8 @@ export class EventsController {
    *
    * @param toStrip : String string to be stripped and converted
    */
-  private stripAccentsToUpper(toStrip: String) :String|null {
-    if (toStrip == null) { return null }
+  private stripAccentsToUpper(toStrip: string) :string {
+    require(toStrip) // if (toStrip == null) { return null }
     var r = toStrip.toLowerCase()
     r = r.replace(new RegExp(/\s/g),"");
     r = r.replace(new RegExp(/[àáâãäå]/g),"a");
@@ -152,9 +155,10 @@ export class EventsController {
    */
   @Get('get-by-region')
   async fetchEventsInRegion(@Res() response, @Query() query: QueryDTO) {
+      const city: string = query.city ? this.stripAccentsToUpper(query.city) : query.city
       var events =  await this.eventsService.findEventsInRegion(
                                           query.continent, query.country, query.state,
-                                          this.stripAccentsToUpper(query.city))
+                                          city)
 
       return response.status(HttpStatus.OK).json({ events })
 
@@ -163,9 +167,12 @@ export class EventsController {
 /** Query by category
   *
   * API parameters :
-  *  @param category : String - category code
-  *  @param subcategory : String - subcategory code. If left blank will return
+  *  @param category : String[] - category codes
+  *  @param subcategory : String[] - subcategory codes. If left blank will return
   *    all all events in a category
+  *
+  *  can pass data either as category = [cat1, cat2] etc. OR as
+  *   category[0] = cat1, category[1] = cat1
   *
   *  PRE : subcategory in catCodes.category || subcategory = Null &&
   *     catCodes.category != Null (ie, category exists) || category == null --
@@ -193,7 +200,7 @@ export class EventsController {
  /** Query by stock / commodity
    *
    * API parameters :
-   * @param stock : String - stock code, using code as traded on relevant market
+   * @param stocks : String - stock code, using code as traded on relevant market
    *
    * PRE : stock is one of the stocks we track
    *
