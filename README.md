@@ -30,7 +30,7 @@ Location data is encoded using standard ISO Alpha-2 codes - these can be found
         later,
       subcategory: String - see note re category,
       detail : String,
-      region : ObjectID from location DB - see above,
+      region : [ObjectID from location DB - see above],
       actors : [String],
       stocks : [String]
 
@@ -116,19 +116,26 @@ We are creating a REST API for events. The address of this will obviously be
 
 ```
   {
-    "timeStamp" : "Tue 29 Mar 2022 02:56:15" ,
-    "source" : "example",
-    "relevance" : -4,
-    "positivity" : 17,
-    "category" : "GEOP",
-    "subcategory" : "REF",
-    "detail": "example referendum regarding code efficacy in munich",
-    "continent":"Europe",
-    "country": "GE",
-    "state" : "Bavaria",
-    "city" : "Munich",
-    "actors" : ["lloyd"]
-  }
+      "timeStamp": "2022-04-16",
+      "sentiment": 100,
+      "relevance": 1,
+      "source": "Newspaper X",
+      "category": "FIN",
+      "subcategory": "PRL",
+      "detail": "Tech companies made less money",
+      "actors": ["Apple Inc.", "Tesla Inc."],
+      "stocks": ["AAPL", "TSLA"],
+      "eventRegions": [
+          {"city": "New York",
+          "state": "New York",
+          "country": "United States",
+          "continent": "North America"},
+          {"city": "San Francisco",
+          "state": "California",
+          "country": "United States",
+          "continent": "North America"}
+      ]
+    }
 ```
 
 ##### create-many
@@ -141,7 +148,7 @@ We are creating a REST API for events. The address of this will obviously be
 Body should be an array of objects as above, eg. body :
   ```
 
-  [
+    [
       {
           "timeStamp": "2022-04-16",
           "sentiment": 100,
@@ -152,10 +159,16 @@ Body should be an array of objects as above, eg. body :
           "detail": "Tech companies made less money",
           "actors": ["Apple Inc.", "Tesla Inc."],
           "stocks": ["AAPL", "TSLA"],
-          "city": "New York",
-          "state": "New York",
-          "country": "United States",
-          "continent": "North America"
+          "eventRegions": [
+              {"city": "New York",
+              "state": "New York",
+              "country": "United States",
+              "continent": "North America"},
+              {"city": "San Francisco",
+              "state": "California",
+              "country": "United States",
+              "continent": "North America"}
+          ]
       },
       {
           "timeStamp": "2022-05-16",
@@ -167,10 +180,16 @@ Body should be an array of objects as above, eg. body :
           "detail": "Tech companies made money this time",
           "actors": ["Apple Inc.", "Tesla Inc."],
           "stocks": ["AAPL", "TSLA"],
-          "city": "São Paulo",
-          "state": "São Paulo",
-          "country": "Brazil",
-          "continent": ""
+          "eventRegions": [
+              {"city": "New York",
+              "state": "New York",
+              "country": "United States",
+              "continent": "North America"},
+              {"city": "San Francisco",
+              "state": "California",
+              "country": "United States",
+              "continent": "North America"}
+          ]
       }
   ]
 ```
