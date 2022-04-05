@@ -184,8 +184,11 @@ export class EventsService {
           }
         }
 
-        if (Object.keys(toCheck).includes('continent') && 
-              Object.keys(toCheck).includes('country')) {
+        if (Object.keys(toCheck).includes('country')) {
+          if (!Object.keys(toCheck).includes('continent')) {
+            toCheck['continent'] = COUNTCONT[`${toCheck.country}`][0]
+          }
+
           if (!COUNTCONT[`${toCheck.country}`].includes(toCheck.continent)) 
             throw new Error('Country is not in the given continent')
         }
