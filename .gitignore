@@ -105,3 +105,4 @@ dist
 
 # virtual environment for scrapers
 scrapervenv
+.env.secret
