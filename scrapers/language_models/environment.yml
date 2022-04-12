@@ -12,6 +12,7 @@ dependencies:
   - nltk
   - tqdm
   - ipykernel=5.1.3
+  - jupyerlab
   - transformers=4.1.1
   - pip:
     - joblib==0.13.2
