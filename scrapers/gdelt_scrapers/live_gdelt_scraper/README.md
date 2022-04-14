@@ -3,12 +3,12 @@ Change filter.txt to alter what data you are filtering in. Current example usage
 2000-01-01,2030-01-01  
 -1000,1000  
 -100,100  
-  
-  
-  
-  
+<br/>
+<br/>
+<br/>
+<br/>
 KYIV/POLAND,RUSSIA  
-  
+<br/>
 RS,UP/US  
 '  
 The first line contains start and end date (these are both inclusive).  
