@@ -71,12 +71,14 @@ export class QueryDTO {
     from: Date;
     to: Date;
 
-    isFIPS: boolean
+    isFIPS: boolean;
 
     continent : string;
     country : string;
     state: string;
     city : string;
+
+    sources: string[];
     categories: string[];
     subcategories: string[];
     stocks: string[]

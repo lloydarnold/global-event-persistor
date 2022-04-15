@@ -469,6 +469,10 @@ export class EventsService {
 
       }
 
+      if (query.sources) {
+        eventsQuery.where('source').in(query.sources);
+      }
+
       const regionAttributes = this.validateRegion({
         isFIPS: query.isFIPS, 
         continent: query.continent,
