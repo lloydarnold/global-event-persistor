@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 from google.oauth2 import service_account
+import scutility
 import requests
 
 
@@ -31,7 +32,7 @@ def convert(entry):
         "positivity": entry.AvgTone,
         "relevance": entry.GoldsteinScale,
         "source": entry.SOURCEURL,
-        "category": entry.EventCode,
+        "category": "",
         "subcategory": "", # TODO: Implement subcategories
         "detail": entry.SOURCEURL,
         "actors": [entry.Actor1Name, entry.Actor2Name],
@@ -77,6 +78,8 @@ def main():
 
     for entry in entries:
         finalList.append(entry)
+
+    scutility.classify_entries(finalList)
 
     r = requests.post("http://localhost:3000/events/create-many", json=finalList)
 
