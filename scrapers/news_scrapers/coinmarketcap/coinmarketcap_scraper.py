@@ -85,7 +85,6 @@ def make_event(news, sentiment):
     event = {
         "timeStamp": news['timestamp'],
         "positivity": delta_sent,
-        "relevance": -1,
         "source": news['source'],
         "category": "FIN",
         "detail": news['detail'],
