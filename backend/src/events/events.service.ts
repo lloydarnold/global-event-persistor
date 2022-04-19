@@ -130,6 +130,11 @@ export class EventsService {
     //     return createdEvent.save();
     // }
 
+    // private fillIfNull(x, field) {
+    //   if (x[`${field}`]) return x
+    //   else return null
+    // }
+
     /** Create multiple events
       *  @param eventDict
       *   Verifies if region exists and create one if not
@@ -177,12 +182,20 @@ export class EventsService {
     }
 
     private validateRegion( toCheck: RegionCreationDTO ) : RegionCreationDTO {
-
+      var region
       if (toCheck.isFIPS) {
-        return this.validateFips(toCheck)
+        region = this.validateFips(toCheck)
       }
       else {
-        return this.validateIso(toCheck)
+        region = this.validateIso(toCheck)
+      }
+
+      return {
+        isFIPS: region["isFIPS"],
+        continent: region["continent"],
+        country: region["country"],
+        state: region["state"],
+        city: region["city"]
       }
     }
 
