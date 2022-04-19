@@ -90,6 +90,10 @@ def filterEntry(entry,input_lines):
 
     #category filter:
 
+    if len(lines[4][0])!=0:
+        if entry["category"] not in lines[4]:
+            boolean=False
+
     #subcategory filter:
 
     #detail filter:
@@ -246,7 +250,7 @@ def main():
             except:
                 print("An exception occured when parsing this entry")
     
-    converted_entries = converted_entries[:10] # limitting to 10 entries for testing
+    converted_entries = converted_entries[:20] # limitting to 10 entries for testing
     
     print("classifying...")
     scutility.classify_entries(converted_entries)
@@ -254,7 +258,7 @@ def main():
     print("uploading...")
     for converted_entry in converted_entries:
         if filterEntry(converted_entry,lines):
-            if converted_entry["category"] != "INVALID_SOURCE":
+            """if converted_entry["category"] != "INVALID_SOURCE":
                 r = requests.post("http://localhost:3000/events", json=converted_entry)
                 if r.status_code != 201:
                     print(f"Status Code: {r.status_code}, Response: {r.json()}")
@@ -262,6 +266,15 @@ def main():
                     print(f"Status Code: {r.status_code}, Success")
             else:
                 print("INVALID_SOURCE")
+            """
+            if converted_entry["category"] == "INVALID_SOURCE":
+                converted_entry["category"] == ""
+
+            r = requests.post("http://localhost:3000/events", json=converted_entry)
+            if r.status_code != 201:
+                print(f"Status Code: {r.status_code}, Response: {r.json()}")
+            else:
+                print(f"Status Code: {r.status_code}, Success")
     
     # delete .csv file
     os.remove(csv_file)
