@@ -66,6 +66,76 @@ fields = [
     "SOURCEURL"
 ]
 
+def filterEntry(entry,input_lines):
+
+    lines = []
+    for i in input_lines:
+        lines.append(i)
+
+    boolean = True
+    
+    #Date filter:
+    if len(lines[0][0])!=0:
+        boolean = compareDates(lines[0][0],entry["timeStamp"]) and compareDates(entry["timeStamp"],lines[0][1]) 
+
+    #Positivity filter:
+    if len(lines[1][0])!=0:
+        boolean = boolean and int(lines[1][0])<=entry["positivity"] and int(lines[1][1])>=entry["positivity"]
+
+    #Relevance filter:
+    if len(lines[2][0])!=0:
+        boolean = boolean and int(lines[2][0])<=entry["relevance"] and int(lines[2][1])>=entry["relevance"]
+
+    #Source filter:
+
+    #category filter:
+
+    #subcategory filter:
+
+    #detail filter:
+
+    #actors filter:
+    if len(lines[7][0][0])!=0:
+
+        for i in lines[7]:
+            tempBool=False
+            for x in i:
+                if x in entry["actors"]:
+                    tempBool=True
+            boolean = boolean and tempBool
+
+    #stocks filter:
+
+    #eventRegions filter:
+    if len(lines[9][0][0])!=0:
+
+        for i in lines[9]:
+            tempBool=False
+            for x in i:
+                if {"country":x} in entry["eventRegions"]:
+                    tempBool=True
+            boolean = boolean and tempBool
+
+    return boolean 
+
+def compareDates(date1, date2): #Returns true if date1<=date2
+    if int(date1[:4]) > int(date2[:4]):
+        return False
+    elif int(date1[:4]) < int(date2[:4]):
+        return True
+    else:
+        if int(date1[5:7]) > int(date2[5:7]):
+            return False
+        elif int(date1[5:7]) < int(date2[5:7]):
+            return True
+        else:
+            if int(date1[8:10]) > int(date2[8:10]):
+                return False
+            elif int(date1[8:10]) < int(date2[8:10]):
+                return True
+            else:
+                return True
+
 def convert(entry):
     date = entry[fields.index("SQLDATE")]
     
@@ -113,6 +183,22 @@ def convert(entry):
 
 def main():
     gdelt_base_url = "http://data.gdeltproject.org/events/"
+
+    file = open("filter.txt","r") #filter the entries:
+    lines = file.readlines()
+    file.close()
+
+    while len(lines)<10:
+        lines.append("")
+
+    for i in range(0,len(lines)):
+        lines[i]=lines[i].strip("\n").split(",")
+
+    for i in range(0, len(lines[7])):
+        lines[7][i] = lines[7][i].split("/")
+
+    for i in range(0, len(lines[9])):
+        lines[9][i] = lines[9][i].split("/")
 
     # get the list of all the links on the gdelt file page
     page = requests.get(gdelt_base_url+'index.html')
@@ -167,14 +253,15 @@ def main():
 
     print("uploading...")
     for converted_entry in converted_entries:
-        if converted_entry["category"] != "INVALID_SOURCE":
-            r = requests.post("http://localhost:3000/events", json=converted_entry)
-            if r.status_code != 201:
-                print(f"Status Code: {r.status_code}, Response: {r.json()}")
+        if filterEntry(converted_entry,lines):
+            if converted_entry["category"] != "INVALID_SOURCE":
+                r = requests.post("http://localhost:3000/events", json=converted_entry)
+                if r.status_code != 201:
+                    print(f"Status Code: {r.status_code}, Response: {r.json()}")
+                else:
+                    print(f"Status Code: {r.status_code}, Success")
             else:
-                print(f"Status Code: {r.status_code}, Success")
-        else:
-            print("INVALID_SOURCE")
+                print("INVALID_SOURCE")
     
     # delete .csv file
     os.remove(csv_file)
