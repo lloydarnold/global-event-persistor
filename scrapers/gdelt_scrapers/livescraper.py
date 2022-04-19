@@ -1,10 +1,9 @@
 import requests
 import lxml.html as lh
 import os.path
-# import urllib
 import zipfile
-import glob
-import operator
+import scutility
+from newsplease import NewsPlease
 
 fields = [
     "GLOBALEVENTID",
@@ -67,6 +66,80 @@ fields = [
     "SOURCEURL"
 ]
 
+def filterEntry(entry,input_lines):
+
+    lines = []
+    for i in input_lines:
+        lines.append(i)
+
+    boolean = True
+    
+    #Date filter:
+    if len(lines[0][0])!=0:
+        boolean = compareDates(lines[0][0],entry["timeStamp"]) and compareDates(entry["timeStamp"],lines[0][1]) 
+
+    #Positivity filter:
+    if len(lines[1][0])!=0:
+        boolean = boolean and int(lines[1][0])<=entry["positivity"] and int(lines[1][1])>=entry["positivity"]
+
+    #Relevance filter:
+    if len(lines[2][0])!=0:
+        boolean = boolean and int(lines[2][0])<=entry["relevance"] and int(lines[2][1])>=entry["relevance"]
+
+    #Source filter:
+
+    #category filter:
+
+    if len(lines[4][0])!=0:
+        if entry["category"] not in lines[4]:
+            boolean=False
+
+    #subcategory filter:
+
+    #detail filter:
+
+    #actors filter:
+    if len(lines[7][0][0])!=0:
+
+        for i in lines[7]:
+            tempBool=False
+            for x in i:
+                if x in entry["actors"]:
+                    tempBool=True
+            boolean = boolean and tempBool
+
+    #stocks filter:
+
+    #eventRegions filter:
+    if len(lines[9][0][0])!=0:
+
+        for i in lines[9]:
+            tempBool=False
+            for x in i:
+                if {"country":x} in entry["eventRegions"]:
+                    tempBool=True
+            boolean = boolean and tempBool
+
+    return boolean 
+
+def compareDates(date1, date2): #Returns true if date1<=date2
+    if int(date1[:4]) > int(date2[:4]):
+        return False
+    elif int(date1[:4]) < int(date2[:4]):
+        return True
+    else:
+        if int(date1[5:7]) > int(date2[5:7]):
+            return False
+        elif int(date1[5:7]) < int(date2[5:7]):
+            return True
+        else:
+            if int(date1[8:10]) > int(date2[8:10]):
+                return False
+            elif int(date1[8:10]) < int(date2[8:10]):
+                return True
+            else:
+                return True
+
 def convert(entry):
     date = entry[fields.index("SQLDATE")]
     
@@ -86,12 +159,24 @@ def convert(entry):
             "country": entry[fields.index("ActionGeo_CountryCode")]
         })
     
+    # Classify stuff
+    # category = ""
+    # url = "http://127.0.0.1:8080/news-classification"
+    # try:
+    #     source_url = entry[fields.index("SOURCEURL")]
+    #     news = NewsPlease.from_url(source_url).get_dict()
+    #     js = {"texts": [news["title"]]}
+    #     res = requests.post(url, json=js)
+    #     category = res.json()["ans"]
+    # except:
+    #     category = "ERROR" # This will be used to filter stuff below, won't make it to our database
+    
     return {
         "timeStamp": date[:4]+"-"+date[4:6]+"-"+date[6:8],
         "positivity": float(entry[fields.index("AvgTone")]),
         "relevance": float(entry[fields.index("GoldsteinScale")]),
         "source": entry[fields.index("SOURCEURL")],
-        "category": entry[fields.index("EventCode")],
+        "category": "",
         "subcategory": "", # TODO: Implement subcategories
         "detail": entry[fields.index("SOURCEURL")],
         "actors": [entry[fields.index("Actor1Name")], entry[fields.index("Actor2Name")]],
@@ -102,6 +187,22 @@ def convert(entry):
 
 def main():
     gdelt_base_url = "http://data.gdeltproject.org/events/"
+
+    file = open("filter.txt","r") #filter the entries:
+    lines = file.readlines()
+    file.close()
+
+    while len(lines)<10:
+        lines.append("")
+
+    for i in range(0,len(lines)):
+        lines[i]=lines[i].strip("\n").split(",")
+
+    for i in range(0, len(lines[7])):
+        lines[7][i] = lines[7][i].split("/")
+
+    for i in range(0, len(lines[9])):
+        lines[9][i] = lines[9][i].split("/")
 
     # get the list of all the links on the gdelt file page
     page = requests.get(gdelt_base_url+'index.html')
@@ -132,31 +233,59 @@ def main():
     csv_file = zip_file[:-4]
     print(csv_file)
 
-    print("uploading...")
-    data = []
+    print("parsing...")
+    converted_entries = []
     with open(csv_file, mode="r", encoding="utf-8") as entries:
         for entry in entries:
             try:
                 converted_entry = convert(entry.split("\t"))
-                if converted_entry["relevance"] > 9.0:
-                    data.append(converted_entry)
-                    r = requests.post("http://localhost:3000/events", json=converted_entry)
-                    if r.status_code != 201:
-                        print(f"Status Code: {r.status_code}, Response: {r.json()}")
-                    else:
-                        print(f"Status Code: {r.status_code}, Success")
+                converted_entries.append(converted_entry)
+                # if converted_entry["category"] != "ERROR":
+                #     data.append(converted_entry)
+                #     r = requests.post("http://localhost:3000/events", json=converted_entry)
+                #     if r.status_code != 201:
+                #         print(f"Status Code: {r.status_code}, Response: {r.json()}")
+                #     else:
+                #         print(f"Status Code: {r.status_code}, Success")
             except:
-                print("An exception occured when parsing this row")
+                print("An exception occured when parsing this entry")
+    
+    converted_entries = converted_entries[:20] # limitting to 10 entries for testing
+    
+    print("classifying...")
+    scutility.classify_entries(converted_entries)
+
+    print("uploading...")
+    for converted_entry in converted_entries:
+        if filterEntry(converted_entry,lines):
+            """if converted_entry["category"] != "INVALID_SOURCE":
+                r = requests.post("http://localhost:3000/events", json=converted_entry)
+                if r.status_code != 201:
+                    print(f"Status Code: {r.status_code}, Response: {r.json()}")
+                else:
+                    print(f"Status Code: {r.status_code}, Success")
+            else:
+                print("INVALID_SOURCE")
+            """
+            if converted_entry["category"] == "INVALID_SOURCE":
+                converted_entry["category"] == ""
+
+            r = requests.post("http://localhost:3000/events", json=converted_entry)
+            if r.status_code != 201:
+                print(f"Status Code: {r.status_code}, Response: {r.json()}")
+            else:
+                print(f"Status Code: {r.status_code}, Success")
     
     # delete .csv file
     os.remove(csv_file)
     
     print("done!")
 
-    # r = requests.post("http://localhost:3000/events/create-many", json=data)
 
-    # print(f"Status Code: {r.status_code}, Response: {r.json()}")
-
+def get_category(texts, url = 'http://127.0.0.1:8080/news-classification'):
+    js = { 'texts': texts }
+    res = requests.post(url, json = js)
+    return res.json()['ans']
 
 if __name__ == "__main__":
     main()
