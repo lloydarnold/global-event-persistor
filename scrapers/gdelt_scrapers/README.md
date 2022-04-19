@@ -7,3 +7,5 @@ To activate the virtual environment:
 - For bash/mac ```source scrapervenv/Scripts/activate```
 
 To deactivate the virtual environment ```deactivate```
+
+# filter.txt format
