@@ -28,5 +28,3 @@ The second and third lines contain lower and upper bounds for positivity and rel
 The fifth line is for filtering based on categories, separate the categories by commas. It will only include entries that have one of the listed categories.  
 The blank lines are all placeholders for adding in filters based on URL for example. Note that these filters have not been coded in yet.
 The eighth and tenth line are for actors and country codes. The format is to use a '/' for an OR, and a ',' for an AND. For example, 'KYIV/POLAND,RUSSIA' refers to (KYIV OR POLAND) AND RUSSIA.
-
-Note that some forms of verification should still be done. For example if the first line of this txt is empty, it should be the case that all dates are considered.
