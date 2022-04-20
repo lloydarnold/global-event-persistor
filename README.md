@@ -194,6 +194,27 @@ Body should be an array of objects as above, eg. body :
   ]
 ```
 
+Observation: the API also supports FIPS codes for countries and regions, but if these are used it must be specified in the JSON of the region to be created:
+```
+{
+    "timeStamp": "2022-04-16",
+    "sentiment": 100,
+    "relevance": 1,
+    "source": "Newspaper X",
+    "category": "FIN",
+    "subcategory": "PRL",
+    "detail": "The sun rose",
+    "actors": ["Apple Inc.", "Tesla Inc."],
+    "stocks": ["AAPL", "TSLA"],
+    "eventRegions": [
+        {
+            "isFIPS": 1,
+            "country": "UP"
+        }
+    ]
+}
+```
+
 ##### get-all
 Returns all events.
 
