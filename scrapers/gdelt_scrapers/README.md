@@ -10,7 +10,7 @@ To deactivate the virtual environment ```deactivate```
 
 # livescraper.py Setup
 
-You will need the inference API in language_models running and the backend running for this code to run. 
+You will need the inference API in language_models running and the backend running for this code to run. Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
 
 # filter.txt format
 
