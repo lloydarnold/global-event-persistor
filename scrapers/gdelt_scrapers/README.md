@@ -8,9 +8,15 @@ To activate the virtual environment:
 
 To deactivate the virtual environment ```deactivate```
 
+You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories)
+
+# historicalscraper.py Setup
+
+Google BigQuery needs to be setup to run this code.
+
 # livescraper.py Setup
 
-You will need the inference API in language_models running and the backend running for this code to run. Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
+Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
 
 # filter.txt format
 
