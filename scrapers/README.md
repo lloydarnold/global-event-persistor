@@ -151,11 +151,15 @@ Logs are written to `twitter_scraper.log`.
 
 You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories)
 
-### historicalscraper.py Setup
+## historicalscraper.py Setup
 
-Google BigQuery needs to be setup to run this code.
+This scraper will fetch all entries satisfying the query given in the GDELT database and add these to the database using Google BigQuery. Additionally, it utilises an inference API (in language_models) that classifies the categeory of the event based on the source URL.
 
-### livescraper.py Setup
+## Configuration
+
+Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. 
+
+## livescraper.py Setup
 
 Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
 
