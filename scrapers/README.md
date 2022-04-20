@@ -151,7 +151,7 @@ Logs are written to `twitter_scraper.log`.
 
 You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories)
 
-## historicalscraper.py Setup
+## GDELT Query
 
 This scraper will fetch all entries satisfying the query given in the GDELT database and add these to the database using Google BigQuery. Additionally, it utilises an inference API (in language_models) that classifies the categeory of the event based on the source URL.
 
