@@ -9,6 +9,9 @@ import * as COUNTNAMES from './../res/countriesToCodes.json'
 import * as COUNTCONT from './../res/countriesToConts.json'
 import * as SUBCOUNT from './../res/subdivisionToCountry.json'
 import * as SUBNAMECODE from './../res/subdivisionNameToCode.json'
+import * as FIPSTOISO from './../res/fipsToIso.json'
+import * as FIPSCOUNTREG from './../res/countriesToRegs.json'
+import * as NAMETOFIPS from './../res/nameToFips.json'
 import { create } from 'domain';
 
 @Injectable()
@@ -127,6 +130,11 @@ export class EventsService {
     //     return createdEvent.save();
     // }
 
+    // private fillIfNull(x, field) {
+    //   if (x[`${field}`]) return x
+    //   else return null
+    // }
+
     /** Create multiple events
       *  @param eventDict
       *   Verifies if region exists and create one if not
@@ -173,33 +181,88 @@ export class EventsService {
       return await this.eventModel.exists(eventDTO)
     }
 
-    private validateRegion( toCheck: {
-      continent: string, country: string, state: string, city:  string} ) {
+    private validateRegion( toCheck: RegionCreationDTO ) : RegionCreationDTO {
+      var region
+      if (toCheck.isFIPS) {
+        region = this.validateFips(toCheck)
+      }
+      else {
+        region = this.validateIso(toCheck)
+      }
 
-        for (const [key, value] of Object.entries(toCheck)) {
-          if (!toCheck[key] || toCheck[key].length == 0) {
-              delete toCheck[key]
-          } else {
-            toCheck[key] = this.validateKey(key, value)
-          }
+      return {
+        isFIPS: region["isFIPS"],
+        continent: region["continent"],
+        country: region["country"],
+        state: region["state"],
+        city: region["city"]
+      }
+    }
+
+    private validateFips(toCheck: RegionCreationDTO) : RegionCreationDTO {
+      if (toCheck.country) {
+        toCheck.country = this.trimToUpperNoAccents(toCheck.country)
+        if (Object.keys(NAMETOFIPS).includes(toCheck.country))
+          toCheck.country = NAMETOFIPS[`${toCheck.country}`]
+
+        if (!Object.keys(FIPSTOISO).includes(toCheck.country))
+          throw new Error ("Invalid FIPS code")
+
+        if (toCheck.state) {
+          toCheck.state = this.trimToUpperNoAccents(toCheck.state)
+          if (!FIPSCOUNTREG[`${toCheck.country}`].some(x => x.includes(toCheck.state)))
+            throw new Error (`Given country does not contain the given region. Regions are ${FIPSCOUNTREG[`${toCheck.country}`].toString()}`)
+          
+          toCheck.state = FIPSCOUNTREG[`${toCheck.country}`].filter(x => x.includes(toCheck.state))[0][0]
         }
 
-        if (Object.keys(toCheck).includes('country')) {
-          if (!Object.keys(toCheck).includes('continent')) {
-            toCheck['continent'] = COUNTCONT[`${toCheck.country}`][0]
-          }
+        const isoCode = FIPSTOISO[`${toCheck.country}`]
 
-          if (!COUNTCONT[`${toCheck.country}`].includes(toCheck.continent)) 
-            throw new Error('Country is not in the given continent')
+        if (!Object.keys(toCheck).includes('continent')) {
+          toCheck['continent'] = COUNTCONT[isoCode][0]
         }
 
-        if (Object.keys(toCheck).includes('state')) {
-          //console.log(toCheck)
-          toCheck['state'] = this.fixSubdiv(toCheck['state'], toCheck['country'])
-          //console.log(toCheck)
+        else if (!COUNTCONT[isoCode].includes(toCheck.continent)) 
+          throw new Error('Country is not in the given continent')
+
+        if (toCheck.city)
+          toCheck.city = this.fixCity(toCheck.city)
+      } 
+
+      else {
+        if (Object.keys(toCheck).includes('state') ||
+              Object.keys(toCheck).includes('city')) {
+          throw new Error ("Must specify country to query by city or region")
+        }
+      }
+
+      return toCheck
+    }
+
+    private validateIso(toCheck: RegionCreationDTO) : RegionCreationDTO {
+      for (const [key, value] of Object.entries(toCheck)) {
+        if (!toCheck[key] || toCheck[key].length == 0) {
+            delete toCheck[key]
+        } else {
+          toCheck[key] = this.validateKey(key, value)
+        }
+      }
+
+      if (Object.keys(toCheck).includes('country')) {
+        if (!Object.keys(toCheck).includes('continent')) {
+          toCheck['continent'] = COUNTCONT[`${toCheck.country}`][0]
         }
 
-        return toCheck
+        if (!COUNTCONT[`${toCheck.country}`].includes(toCheck.continent)) 
+          throw new Error('Country is not in the given continent')
+      }
+
+      if (Object.keys(toCheck).includes('state')) {
+        //console.log(toCheck)
+        toCheck['state'] = this.fixSubdiv(toCheck['state'], toCheck['country'])
+        //console.log(toCheck)
+      }
+      return toCheck
     }
 
     private trimToUpperNoAccents(s: string) : string {
@@ -419,7 +482,12 @@ export class EventsService {
 
       }
 
-      var regionAttributes = this.validateRegion({
+      if (query.sources) {
+        eventsQuery.where('source').in(query.sources);
+      }
+
+      const regionAttributes = this.validateRegion({
+        isFIPS: query.isFIPS, 
         continent: query.continent,
         country: query.country,
         state: query.state,

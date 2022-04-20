@@ -44,6 +44,7 @@ export interface Event extends mongoose.Document {
 }
 
 export class RegionCreationDTO {
+    isFIPS : boolean;
     continent : string;
     country : string;
     state: string; // state, province, county, etc; varies
@@ -69,10 +70,15 @@ export class EventCreationDTO {
 export class QueryDTO {
     from: Date;
     to: Date;
+
+    isFIPS: boolean;
+
     continent : string;
     country : string;
     state: string;
     city : string;
+
+    sources: string[];
     categories: string[];
     subcategories: string[];
     stocks: string[]

@@ -1,0 +1,15 @@
+[general]
+DEBUG = 1
+
+[acquisition]
+SOURCE_URL = https://api.coinmarketcap.com/content/v3/news
+PAGE_SIZE = 200
+NUM_ARTICLES=10
+DATETIME_FORMAT=%Y-%m-%dT%H:%M:%S
+
+[inference]
+CLASSIFICATION_URL = http://127.0.0.1:8080/news-classification
+SENTIMENT_URL = http://127.0.0.1:8080/finbert
+
+[database]
+DB_ENDPOINT= http://localhost:3000/events/create-many

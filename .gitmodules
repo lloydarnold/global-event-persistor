@@ -1,0 +1,3 @@
+[submodule "scrapers/news_scrapers/finBERT"]
+	path = scrapers/news_scrapers/finBERT
+	url = https://github.com/FelipeNuti/finBERT.git

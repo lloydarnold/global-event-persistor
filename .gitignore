@@ -105,3 +105,11 @@ dist
 
 # virtual environment for scrapers
 scrapervenv
+.env.secret
+
+# data downloaded by scrapers
+generic_news/data
+generic_news/.resume_jobdir
+
+# service account file for google big query
+service-account-file.json

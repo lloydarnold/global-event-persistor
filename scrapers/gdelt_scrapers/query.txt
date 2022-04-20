@@ -1,0 +1,8 @@
+SELECT *
+FROM `gdelt-bq.full.events`
+WHERE
+(Actor1CountryCode = 'GBR'
+OR Actor1Geo_Fullname = 'United Kingdom'
+OR Actor2Geo_CountryCode = 'UK')
+AND Year = 2010
+LIMIT 1

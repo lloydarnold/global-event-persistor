@@ -1,0 +1,21 @@
+[general]
+DEBUG = 1
+CATEGORY = FIN
+
+[acquisition]
+SOURCE_URL = https://api.twitter.com/2/tweets/search/recent
+NUM_tweets=100
+DATETIME_FORMAT=%Y-%m-%dT%H:%M:%S
+
+[query]
+SEARCH_WORDS = ["crypto", "DeFi", "#BTC", "Ethereum", "Solana"] 
+LANGUAGE = en
+RETWEETS = 0
+
+[inference]
+CLASSIFICATION_URL = http://127.0.0.1:8080/news-classification
+SENTIMENT_URL = http://127.0.0.1:8080/tweetbert
+SENTIMENT_PROB_MARGIN = 0.05
+
+[database]
+DB_ENDPOINT= http://localhost:3000/events/create-many
