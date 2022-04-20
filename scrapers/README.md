@@ -2,6 +2,16 @@
 
 We developed scrapers for GDELT, Twitter and Coinmarketcap News. Here is how they work:
 
+## Scrapers Setup
+
+A virtual environment is set up with all packages set up in scravervenv/
+
+To activate the virtual environment:
+- For windows ```scrapervenv\Scripts\activate```
+- For bash/mac ```source scrapervenv/Scripts/activate```
+
+To deactivate the virtual environment ```deactivate```
+
 ## Coinmarketcap Scraper
 
 This scraper gets news directly from Coinmarketcap's News API. It provides news from various Crypto assets, and tags each article with the relevant assets. The scraper also provides a sentiment tag for the headline of news articles, which is obtained using FinBERT, a BERT model finetuned for estimating the sentiment of financial news headlines.
@@ -136,5 +146,39 @@ python twitter_scraper.py
 Notice that the inference API and the Backend also need to be running (or deployed remotely), with the appropriate URLs in the configuration file.
 
 Logs are written to `twitter_scraper.log`.
+
+## GDELT Scrapers:
+
+You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories)
+
+### historicalscraper.py Setup
+
+Google BigQuery needs to be setup to run this code.
+
+### livescraper.py Setup
+
+Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
+
+#### filter.txt format
+
+Change filter.txt to alter what data you are filtering in. Current example usage:  
+'  
+2000-01-01,2030-01-01  
+-1000,1000  
+-100,100  
+<br/>
+World,Sci/Tech  
+<br/>
+<br/>
+KYIV/POLAND,RUSSIA  
+<br/>
+RS,UP/US  
+'  
+The first line contains start and end date (these are both inclusive).  
+The second and third lines contain lower and upper bounds for positivity and relevance respectively.  
+The fifth line is for filtering based on categories, separate the categories by commas. It will only include entries that have one of the listed categories.  
+The blank lines are all placeholders for adding in filters based on URL for example. Note that these filters have not been coded in yet.
+The eighth and tenth line are for actors and country codes. The format is to use a '/' for an OR, and a ',' for an AND. For example, 'KYIV/POLAND,RUSSIA' refers to (KYIV OR POLAND) AND RUSSIA.
+
 
 
