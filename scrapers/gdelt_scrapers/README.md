@@ -8,6 +8,10 @@ To activate the virtual environment:
 
 To deactivate the virtual environment ```deactivate```
 
+# livescraper.py Setup
+
+You will need the inference API in language_models running and the backend running for this code to run. 
+
 # filter.txt format
 
 Change filter.txt to alter what data you are filtering in. Current example usage:  
