@@ -153,7 +153,7 @@ You will need the inference API in language_models running and the backend runni
 
 ### Configuration
 
-scutility.py is used to interact with the inference API, so this file must be in scrapers/gdelt_scrapers. When running the inference API, it will state which url it is sending the data to, and so the variable `url` in scutility.py must be changed to this url. 
+`scutility.py` is used to interact with the inference API, so this file must be in scrapers/gdelt_scrapers. When running the inference API, it will state which url it is sending the data to, and so the variable `url` in `scutility.py` must be changed to this url. 
 
 ## GDELT Query
 
@@ -161,9 +161,9 @@ This scraper will fetch all entries satisfying the query given in the GDELT data
 
 ### Configuration
 
-Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. Call this file 'service-account-file.json' and include this in scrapers/gdelt_scrapers.  
+Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. Call this file `service-account-file.json` and include this in scrapers/gdelt_scrapers.  
 <br/>
-query.txt will be used as the query sent to Google BigQuery. Google BigQuery supports standard SQL and legacy SQL. Example for query.txt:
+`query.txt` will be used as the query sent to Google BigQuery. Google BigQuery supports standard SQL and legacy SQL. Example for `query.txt`:
 
 ```
 SELECT *
@@ -185,15 +185,15 @@ python historicalscraper.py
 
 ## Daily GDELT Scraper
 
-Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html. This scraper will be ran daily (could be ran more or less frequently) to scrape from the most recently added data to GDELT and add entries to the database.
+Running this code will find all entries that satisfy the conditions given in `filter.txt` (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html. This scraper will be ran daily (could be ran more or less frequently) to scrape from the most recently added data to GDELT and add entries to the database.
 
 ### Configuration
 
-filter.txt needs to be setup so that only certain data is added to the database:
+`filter.txt` needs to be setup so that only certain data is added to the database:
 
 #### filter.txt format
 
-Change filter.txt to alter what data you are filtering in. Current example usage:  
+Change `filter.txt` to alter what data you are filtering in. Current example usage:  
 '  
 2000-01-01,2030-01-01  
 -1000,1000  
