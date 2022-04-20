@@ -178,6 +178,7 @@ LIMIT 1
 
 ### Usage
 
+In Anaconda:
 ```
 cd scrapers/gdelt_scrapers
 python historicalscraper.py
@@ -214,6 +215,7 @@ The eighth and tenth line are for actors and country codes. The format is to use
 
 ### Usage
 
+In Anaconda:
 ```
 cd scrapers/gdelt_scrapers
 python livescraper.py
