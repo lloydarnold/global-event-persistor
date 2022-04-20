@@ -90,10 +90,6 @@ def filterEntry(entry,input_lines):
 
     #category filter:
 
-    if len(lines[4][0])!=0:
-        if entry["category"] not in lines[4]:
-            boolean=False
-
     #subcategory filter:
 
     #detail filter:
@@ -121,6 +117,12 @@ def filterEntry(entry,input_lines):
             boolean = boolean and tempBool
 
     return boolean 
+
+def categoryFilter(entry,input_categories):
+    if len(input_categories[0])!=0:
+        if entry["category"] not in input_categories:
+            return False
+    return True
 
 def compareDates(date1, date2): #Returns true if date1<=date2
     if int(date1[:4]) > int(date2[:4]):
@@ -239,7 +241,8 @@ def main():
         for entry in entries:
             try:
                 converted_entry = convert(entry.split("\t"))
-                converted_entries.append(converted_entry)
+                if filterEntry(converted_entry,lines):
+                    converted_entries.append(converted_entry)
                 # if converted_entry["category"] != "ERROR":
                 #     data.append(converted_entry)
                 #     r = requests.post("http://localhost:3000/events", json=converted_entry)
@@ -250,14 +253,14 @@ def main():
             except:
                 print("An exception occured when parsing this entry")
     
-    converted_entries = converted_entries[:20] # limitting to 10 entries for testing
+    # converted_entries = converted_entries[:20] # limitting to 10 entries for testing
     
     print("classifying...")
     scutility.classify_entries(converted_entries)
 
     print("uploading...")
     for converted_entry in converted_entries:
-        if filterEntry(converted_entry,lines):
+        if categoryFilter(converted_entry,lines[4]):
             """if converted_entry["category"] != "INVALID_SOURCE":
                 r = requests.post("http://localhost:3000/events", json=converted_entry)
                 if r.status_code != 201:
