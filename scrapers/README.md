@@ -155,7 +155,7 @@ You will need the inference API in language_models running and the backend runni
 
 This scraper will fetch all entries satisfying the query given in the GDELT database and add these to the database using Google BigQuery. Additionally, it utilises an inference API (in language_models) that classifies the categeory of the event based on the source URL.
 
-## Configuration
+### Configuration
 
 Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. Call this file 'service-account-file.json' and include this in scrapers/gdelt_scrapers.  
 <br/>
@@ -171,6 +171,11 @@ OR Actor2Geo_CountryCode = 'UK')
 AND Year = 2010
 LIMIT 1
 ```
+
+### Usage
+
+
+
 
 ## livescraper.py Setup
 
