@@ -2,7 +2,6 @@
 from socket import timeout
 from newsplease import NewsPlease
 import requests
-from bs4 import BeautifulSoup
 import unidecode
 import json
 import re
@@ -64,7 +63,7 @@ def get_news():
         from_coinmarketcap = news_data[i]
         news = {
             'stocks': [asset['name'] for asset in from_coinmarketcap['assets']],
-            'source': from_coinmarketcap['meta']['sourceName'],
+            'source': from_coinmarketcap['meta']['sourceUrl'],
             'detail': from_coinmarketcap['meta']['title'],
             'timestamp': from_coinmarketcap['meta']['releasedAt']
         }
