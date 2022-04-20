@@ -149,7 +149,7 @@ Logs are written to `twitter_scraper.log`.
 
 ## GDELT Scrapers:
 
-You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories)
+You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories).
 
 ## GDELT Query
 
@@ -174,12 +174,18 @@ LIMIT 1
 
 ### Usage
 
+```
+cd scrapers/gdelt_scrapers
+python historicalscraper.py
+```
 
+## Daily GDELT Scraper
 
+Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html.
 
-## livescraper.py Setup
+### Configuration
 
-Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend.  
+filter.txt needs to be setup so that only certain data is added to the database:
 
 #### filter.txt format
 
@@ -201,6 +207,13 @@ The second and third lines contain lower and upper bounds for positivity and rel
 The fifth line is for filtering based on categories, separate the categories by commas. It will only include entries that have one of the listed categories.  
 The blank lines are all placeholders for adding in filters based on URL for example. Note that these filters have not been coded in yet.
 The eighth and tenth line are for actors and country codes. The format is to use a '/' for an OR, and a ',' for an AND. For example, 'KYIV/POLAND,RUSSIA' refers to (KYIV OR POLAND) AND RUSSIA.
+
+### Usage
+
+```
+cd scrapers/gdelt_scrapers
+python livescraper.py
+```
 
 
 
