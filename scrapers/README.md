@@ -181,7 +181,7 @@ python historicalscraper.py
 
 ## Daily GDELT Scraper
 
-Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html.
+Running this code will find all entries that satisfy the conditions given in filter.txt (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html. This scraper will be ran daily (could be ran more or less frequently) to scrape from the most recently added data to GDELT and add entries to the database.
 
 ### Configuration
 
