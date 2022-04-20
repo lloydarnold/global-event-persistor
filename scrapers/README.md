@@ -157,7 +157,20 @@ This scraper will fetch all entries satisfying the query given in the GDELT data
 
 ## Configuration
 
-Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. 
+Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. Call this file 'service-account-file.json' and include this in scrapers/gdelt_scrapers.  
+<br/>
+query.txt will be used as the query sent to Google BigQuery. Google BigQuery supports standard SQL and legacy SQL. Example for query.txt:
+
+```
+SELECT *
+FROM `gdelt-bq.full.events`
+WHERE
+(Actor1CountryCode = 'GBR'
+OR Actor1Geo_Fullname = 'United Kingdom'
+OR Actor2Geo_CountryCode = 'UK')
+AND Year = 2010
+LIMIT 1
+```
 
 ## livescraper.py Setup
 
