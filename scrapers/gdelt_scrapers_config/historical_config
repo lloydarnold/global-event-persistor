@@ -1,0 +1,11 @@
+[database]
+DB_ENDPOINT= http://localhost:3000/events/create-many
+IS_FIPS = 1
+ENTRIES_CAP = -1
+
+[google]
+ACCOUNT_FILE = service-account-file.json
+GOOGLE_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
+
+[query]
+QUERY_FILE = query.txt

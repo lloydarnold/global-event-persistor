@@ -1,0 +1,6 @@
+SELECT *
+FROM `gdelt-bq.full.events`
+WHERE
+(Actor2Geo_CountryCode = 'UP')
+AND Year = 2010
+LIMIT 1
