@@ -94,7 +94,7 @@ def main():
 
     scutility.classify_entries(finalList)
 
-    r = requests.post("http://localhost:3000/events/create-many", json=finalList)
+    r = requests.post("http://3.82.122.96:3000/events/create-many", json=finalList)
 
     print(f"Status Code: {r.status_code}, Response: {r.json()}")
 
