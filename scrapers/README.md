@@ -153,7 +153,12 @@ You will need the inference API in language_models running and the backend runni
 
 ### Configuration
 
-`scutility.py` is used to interact with the inference API, so this file must be in scrapers/gdelt_scrapers. When running the inference API, it will state which url it is sending the data to, and so the variable `url` in `scutility.py` must be changed to this url. 
+`scutility.py` is used to interact with the inference API, so this file must be in scrapers/gdelt_scrapers. This comes with a `scutility_config` which has the following field:
+
+```
+[inference]
+CLASSIFICATION_URL: the endpoint for the classification section of the inference API. http://127.0.0.1:8080/news-classification by default - need to check this when running the inference API
+```
 
 ## GDELT Query
 
@@ -163,6 +168,22 @@ This scraper will fetch all entries satisfying the query given in the GDELT data
 
 Google BigQuery needs to be setup to run this code. A Google BigQuery account will be required, then follow the section "setting up authentication" in the following link https://cloud.google.com/bigquery/docs/reference/libraries#client-libraries-install-python to get a service account file json. Call this file `service-account-file.json` and include this in scrapers/gdelt_scrapers.  
 <br/>
+This scraper comes with a `historical_config` file with the following fields:
+
+```
+[database]
+DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
+IS_FIPS: 1 for FIPS, 0 for no FIPS.
+ENTRIES_CAP: cap the number of entries being classified and sent to the database.
+
+[google]
+ACCOUNT_FILE: name of the service account file for Google BigQuery. service-account-file.json is the default.
+GOOGLE_SCOPES: list of scopes for Google BigQuery. ["https://www.googleapis.com/auth/cloud-platform"] is the default.
+
+[query]
+QUERY_FILE: name of the file containing the query. query.txt by default.
+```
+
 `query.txt` will be used as the query sent to Google BigQuery. Google BigQuery supports standard SQL and legacy SQL. Example for `query.txt`:
 
 ```
@@ -186,32 +207,30 @@ python historicalscraper.py
 
 ## Daily GDELT Scraper
 
-Running this code will find all entries that satisfy the conditions given in `filter.txt` (format explained below) and add them to the specified database in the backend from the most recent csv at http://data.gdeltproject.org/events/index.html. This scraper will be ran daily (could be ran more or less frequently) to scrape from the most recently added data to GDELT and add entries to the database.
+Running this code will find all entries that satisfy the conditions given in `live_config` and add them to the database. This scraper will be ran daily (could be ran more or less frequently) to scrape from the most recently added data to GDELT and add entries to the database.
 
 ### Configuration
 
-`filter.txt` needs to be setup so that only certain data is added to the database:
+This scraper comes with a `live_config` file with the following fields:
 
-#### filter.txt format
+```
+[database]
+DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
+IS_FIPS: 1 for FIPS, 0 for no FIPS.
+ENTRIES_CAP: cap the number of entries being classified and sent to the database.
 
-Change `filter.txt` to alter what data you are filtering in. Current example usage:  
-'  
-2000-01-01,2030-01-01  
--1000,1000  
--100,100  
-<br/>
-World,Sci/Tech  
-<br/>
-<br/>
-KYIV/POLAND,RUSSIA  
-<br/>
-RS,UP/US  
-'  
-The first line contains start and end date (these are both inclusive).  
-The second and third lines contain lower and upper bounds for positivity and relevance respectively.  
-The fifth line is for filtering based on categories, separate the categories by commas. It will only include entries that have one of the listed categories.  
-The blank lines are all placeholders for adding in filters based on URL for example. Note that these filters have not been coded in yet.
-The eighth and tenth line are for actors and country codes. The format is to use a '/' for an OR, and a ',' for an AND. For example, 'KYIV/POLAND,RUSSIA' refers to (KYIV OR POLAND) AND RUSSIA.
+[filter]
+DATE_RANGE: filter entries by dates. [YYYY-MM-DD,YYYY-MM-DD] gives the from and to date of events to include (inclusive of both ends). Use [] for no filtering of dates.
+POS_RANGE: filter entries by positivity. [x,y] gives the lower and upper bound for positivity (inclusive of both ends). Use [] for no filtering.
+REL_RANGE: filter entries by relativitiy. [x,y] gives the lower and upper bound for relativity (inclusive of both ends). Use [] for no filtering.
+CATEGORY_LIST: filter entries by category. Give a list of categories, only entries that have at least one of these categories will be added. Use [] for no filtering.
+ACTOR_LIST: filter by actors. [[Caregiver, Washington],Poland] will only include entries that have (Caregiver or Washington) and Poland as their actors. Use [] for no filtering.
+COUNTRY_LIST: filter by countries. Same format as ACTOR_LIST except this is restricted to country codes (FIPS is the current standard for GDELT).
+
+[gdelt]
+GDELT_URL: URL for the GDELT files. This is http://data.gdeltproject.org/events/ as of now.
+GDELT_FILE: number of file to take from GDELT in order of date. 0 will retrieve the most recent file, 1 the next, etc.
+```
 
 ### Usage
 
