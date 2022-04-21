@@ -273,7 +273,7 @@ def main():
             if converted_entry["category"] == "INVALID_SOURCE":
                 converted_entry["category"] == ""
 
-            r = requests.post("http://localhost:3000/events", json=converted_entry)
+            r = requests.post("http://3.82.122.96:3000/events", json=converted_entry)
             if r.status_code != 201:
                 print(f"Status Code: {r.status_code}, Response: {r.json()}")
             else:
