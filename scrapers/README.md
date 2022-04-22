@@ -280,6 +280,7 @@ This scraper comes with a `live_config` file with the following fields:
 DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
 IS_FIPS: 1 for FIPS, 0 for no FIPS.
 ENTRIES_CAP: cap the number of entries being classified and sent to the database.
+CATEGORY_CLASSIFY: true for category classification and false for no classification. Remove category based classification if processing large amounts of data is more important than the categories of that data.
 
 [filter]
 DATE_RANGE: filter entries by dates. [YYYY-MM-DD,YYYY-MM-DD] gives the from and to date of events to include (inclusive of both ends). Use [] for no filtering of dates.
