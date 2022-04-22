@@ -175,6 +175,7 @@ This scraper comes with a `historical_config` file with the following fields:
 DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
 IS_FIPS: 1 for FIPS, 0 for no FIPS.
 ENTRIES_CAP: cap the number of entries being classified and sent to the database.
+CATEGORY_CLASSIFY: true for category classification and false for no classification. Remove category based classification if processing large amounts of data is more important than the categories of that data.
 
 [google]
 ACCOUNT_FILE: name of the service account file for Google BigQuery. service-account-file.json is the default.
@@ -302,6 +303,3 @@ In Anaconda:
 cd scrapers/gdelt_scrapers
 python livescraper.py
 ```
-
-
-
