@@ -13,6 +13,8 @@ config.read(filenames = './live_config')
 db_endpoint = config.get('database', 'DB_ENDPOINT')
 is_fips = int(config.get('database', 'IS_FIPS'))
 entries_cap = int(config.get('database','ENTRIES_CAP'))
+category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
+
 
 date_range = json.loads(config.get('filter', 'DATE_RANGE'))
 pos_range = json.loads(config.get('filter', 'POS_RANGE'))
@@ -282,8 +284,9 @@ def main():
     
     converted_entries = converted_entries[:entries_cap] # limitting to 10 entries for testing
     
-    print("classifying...")
-    scutility.classify_entries(converted_entries)
+    if category_classify:
+        print("classifying...")
+        scutility.classify_entries(converted_entries)
 
     print("uploading...")
     final_entries = []
