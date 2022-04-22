@@ -7,6 +7,8 @@ from newsplease import NewsPlease
 import configparser
 import json
 
+#test
+
 config = configparser.RawConfigParser()
 config.read(filenames = './live_config')
 
