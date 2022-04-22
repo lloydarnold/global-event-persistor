@@ -11,6 +11,7 @@ config.read(filenames = './historical_config')
 db_endpoint = config.get('database', 'DB_ENDPOINT')
 is_fips = int(config.get('database', 'IS_FIPS'))
 entries_cap = int(config.get('database', 'ENTRIES_CAP'))
+category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
 
 account_file = config.get('google', 'ACCOUNT_FILE')
 google_scopes = json.loads(config.get('google', 'GOOGLE_SCOPES'))
@@ -92,7 +93,8 @@ def main():
     for entry in entries:
         final_list.append(entry)
 
-    scutility.classify_entries(final_list)
+    if category_classify:
+        scutility.classify_entries(final_list)
 
     r = requests.post(db_endpoint, json=final_list)
 
