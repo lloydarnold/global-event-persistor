@@ -1,0 +1,50 @@
+[
+    {
+        "source_name": "Screenrant(movies)",
+        "source_url": "https://screenrant.com/movie-news/",
+        "article_class": "bc-title-link",
+        "cookie_xpath": "/html/body/div[4]/div[1]/div[1]/div/button[1]",
+        "cookie_class": "",
+        "category": "ENT",
+        "subcategory": "",
+        "nav_type": "inf_scroll",
+        "show_more_xpath": "",
+        "n_iters": 20
+    },
+    {
+        "source_name": "independent(football)",
+        "source_url": "https://www.independent.co.uk/sport/football",
+        "article_class": "title",
+        "cookie_xpath": "/html/body/div/div[2]/div[2]/div[2]/div[5]/button[2]",
+        "cookie_class": "sp_choice_type_11",
+        "category": "SPO",
+        "subcategory": "FOOT",
+        "nav_type": "inf_scroll",
+        "show_more_xpath": "",
+        "n_iters": 0
+    },
+    {
+        "source_name": "BBC(football)",
+        "source_url": "https://www.bbc.co.uk/sport/football",
+        "article_class": "gs-c-promo-heading",
+        "cookie_xpath": "",
+        "cookie_class": "",
+        "category": "SPO",
+        "subcategory": "FOOT",
+        "nav_type": "inf_scroll",
+        "show_more_xpath": "",
+        "n_iters": 0
+    },
+    {
+        "source_name": "IGN",
+        "source_url": "https://www.ign.com/news",
+        "article_class": "item-body",
+        "cookie_xpath": "//*[@id=\"_evidon-banner-acceptbutton\"]",
+        "cookie_class": "",
+        "category": "ENT",
+        "subcategory": "",
+        "nav_type": "inf_scroll",
+        "show_more_xpath": "",
+        "n_iters": 10
+    }
+]
