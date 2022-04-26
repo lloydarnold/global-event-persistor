@@ -253,7 +253,7 @@ def main():
             except:
                 print("An exception occured when parsing this entry")
     
-    # converted_entries = converted_entries[:20] # limitting to 10 entries for testing
+    converted_entries = converted_entries[:20] # limitting to 20 entries for testing
     
     print("classifying...")
     scutility.classify_entries(converted_entries)

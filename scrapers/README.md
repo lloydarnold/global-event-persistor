@@ -303,3 +303,50 @@ In Anaconda:
 cd scrapers/gdelt_scrapers
 python livescraper.py
 ```
+
+
+## Generic Scraper
+
+This scraper gets recent articles from specified sources within a 24 hour window.
+
+### Sources
+
+The scraper uses a json filled with news sources. The format is as follows:
+```json
+[
+    {
+        "source_name": "Screenrant(movies)",
+        "source_url": "https://screenrant.com/movie-news/",
+        "article_class": "bc-title-link",
+        "cookie_xpath": "/html/body/div[4]/div[1]/div[1]/div/button[1]",
+        "cookie_class": "",
+        "category": "ENT",
+        "subcategory": "",
+        "nav_type": "inf_scroll",
+        "show_more_xpath": "",
+        "n_iters": 20
+    },
+    ...
+```
+where each field has the fillowing functions:
+```
+source_name -> name of source (not mandatory)
+source_url -> base url of source
+article_class -> the html class responsible for the titles of articles
+cookie_xpath -> xpath to the button of cookie popup (if exists)
+cookie_class -> class name of the button of cookie popup (if exists)
+category -> category of news, pre-conditioned on the source
+subcategory -> subcategory of news, pre-condition on the source
+nav_type -> type of navigation of the site; valid values are: "inf_scroll", "show_more", "pages"
+show_more_xpath -> xpath to show more button
+n_iters -> the number of pages to scroll (this should depend on the website)
+```
+
+### Usage & Pre-requisites
+
+To run this scraper you will need to activate the scraperenv environment with conda. You will also need:
+- Firefox
+- [geckodriver](https://github.com/mozilla/geckodriver/releases) (note that geckodriver has to be in your PATH or in the same directory as the script being run)
+
+This scraper uses selenium to simulate a web browser. This is done because some news sites require scrolling for contents to be loaded, and hence the act of scrolling must be simulated.
+Each run of the scraper will go through the sources and scrape articles from the past 24 hours.
