@@ -149,7 +149,7 @@ Logs are written to `twitter_scraper.log`.
 
 ## GDELT Scrapers:
 
-You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories).
+You will need the inference API in language_models running and the backend running for these gdelt scrapers to run (this API classifies entries into categories). Also these scrapers use a fake news classification model (`gdelt_scrapers_config/fake_news_classification/saved_weights.pt` is the saved model).
 
 ### Configuration
 
