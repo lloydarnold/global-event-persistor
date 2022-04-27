@@ -4,6 +4,7 @@ import scutility
 import requests
 import configparser
 import json
+import classification
 
 config = configparser.RawConfigParser()
 config.read(filenames = './historical_config')
@@ -12,6 +13,7 @@ db_endpoint = config.get('database', 'DB_ENDPOINT')
 is_fips = int(config.get('database', 'IS_FIPS'))
 entries_cap = int(config.get('database', 'ENTRIES_CAP'))
 category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
+news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
 
 account_file = config.get('google', 'ACCOUNT_FILE')
 google_scopes = json.loads(config.get('google', 'GOOGLE_SCOPES'))
@@ -95,6 +97,15 @@ def main():
 
     if category_classify:
         scutility.classify_entries(final_list)
+
+        #Fake news classification
+    if news_classify:
+        predictions = classification.news_classification(final_list)
+        temp = ["isn't","is"]
+        for i in range(0, len(final_list)):
+            if predictions[i]!=-1:
+                final_list[i]['detail'] += ", this "+temp[predictions[i]]+ " fake news"
+
 
     r = requests.post(db_endpoint, json=final_list)
 

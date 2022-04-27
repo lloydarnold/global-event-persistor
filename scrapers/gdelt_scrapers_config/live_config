@@ -3,6 +3,7 @@ DB_ENDPOINT = http://localhost:3000/events/create-many
 IS_FIPS = 1
 ENTRIES_CAP = 20
 CATEGORY_CLASSIFY = True
+NEWS_CLASSIFY = True
 
 [filter]
 DATE_RANGE=[]

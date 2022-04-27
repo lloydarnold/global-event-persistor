@@ -6,6 +6,7 @@ import scutility
 from newsplease import NewsPlease
 import configparser
 import json
+import classification
 
 config = configparser.RawConfigParser()
 config.read(filenames = './live_config')
@@ -14,6 +15,7 @@ db_endpoint = config.get('database', 'DB_ENDPOINT')
 is_fips = int(config.get('database', 'IS_FIPS'))
 entries_cap = int(config.get('database','ENTRIES_CAP'))
 category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
+news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
 
 
 date_range = json.loads(config.get('filter', 'DATE_RANGE'))
@@ -185,10 +187,10 @@ def convert(entry):
         "timeStamp": date[:4]+"-"+date[4:6]+"-"+date[6:8],
         "positivity": float(entry[fields.index("AvgTone")]),
         "relevance": float(entry[fields.index("GoldsteinScale")]),
-        "source": entry[fields.index("SOURCEURL")],
+        "source": entry[fields.index("SOURCEURL")][:-1],
         "category": "",
         "subcategory": "", # TODO: Implement subcategories
-        "detail": entry[fields.index("SOURCEURL")],
+        "detail": entry[fields.index("SOURCEURL")][:-1],
         "actors": [entry[fields.index("Actor1Name")], entry[fields.index("Actor2Name")]],
         "stocks": [], # TODO: Get used stocks
         "eventRegions": regions
@@ -295,6 +297,15 @@ def main():
             if converted_entry["category"] == "INVALID_SOURCE":
                 converted_entry["category"] == ""
             final_entries.append(converted_entry)
+    
+    #Fake news classification
+    if news_classify:
+        predictions = classification.news_classification(final_entries)
+        temp = ["isn't","is"]
+        for i in range(0, len(final_entries)):
+            if predictions[i]!=-1:
+                final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " fake news"
+
 
     r = requests.post(db_endpoint, json=final_entries)
     print(f"Status Code: {r.status_code}")

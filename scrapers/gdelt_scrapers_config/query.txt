@@ -2,5 +2,5 @@ SELECT *
 FROM `gdelt-bq.full.events`
 WHERE
 (Actor2Geo_CountryCode = 'UP')
-AND Year = 2010
-LIMIT 1
+AND Year = 2020
+LIMIT 5

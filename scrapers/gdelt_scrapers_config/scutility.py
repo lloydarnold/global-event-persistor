@@ -16,7 +16,7 @@ def classify_entries(entries: list[dict]) -> None:
     
     for entry in tqdm(entries, desc="Getting Titles..."):
         try:
-            source_url = entry["source"][:-1]
+            source_url = entry["source"]
             n = NewsPlease.from_url(source_url)
             
             title = n.get_dict()["title"]
