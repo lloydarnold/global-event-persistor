@@ -301,10 +301,10 @@ def main():
     #Fake news classification
     if news_classify:
         predictions = classification.news_classification(final_entries)
-        temp = ["isn't","is"]
+        temp = ["unlikely","likely"]
         for i in range(0, len(final_entries)):
             if predictions[i]!=-1:
-                final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " fake news"
+                final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
 
 
     r = requests.post(db_endpoint, json=final_entries)
