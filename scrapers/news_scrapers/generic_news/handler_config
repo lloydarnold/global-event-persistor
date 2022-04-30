@@ -1,0 +1,9 @@
+[general]
+DEBUG = 1
+
+[inference]
+CLASSIFICATION_URL = http://127.0.0.1:8080/news-classification
+SENTIMENT_URL = http://127.0.0.1:8080/general_news_sentiment
+
+[database]
+DB_ENDPOINT= http://localhost:3000/events/create-many
