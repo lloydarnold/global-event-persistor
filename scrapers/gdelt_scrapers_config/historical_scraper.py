@@ -59,15 +59,15 @@ def createRegion(type, countryCode, ADM1Code, fullname):
     print(ADM1Code)
     print(fullname)
     if(type == 1):
-        return {"country": countryCode}
+        return {"isFIPS": True, "country": countryCode}
     if(type == 2):
         return {"country": countryCode, "state": getUsState(ADM1Code)}
     if(type == 3):
         return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
     if(type == 5):
-        return {"country": countryCode, "state": ADM1Code}
+        return {"isFIPS": True, "country": countryCode, "state": ADM1Code}
     if(type == 4):
-        return {"country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+        return {"isFIPS": True, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
 
 def getCity(fullname):
     c = fullname.find(',')
