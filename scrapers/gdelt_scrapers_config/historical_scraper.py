@@ -24,8 +24,6 @@ query_file = config.get('query', 'QUERY_FILE')
 def convert(entry):
     date = str(entry.SQLDATE)
     
-    # regions only store countries for now
-    # TODO: make regions store city/state as well.
     regions=[]
     if(entry.ActionGeo_Type != 0):
         regions.append(createRegion(entry.ActionGeo_Type, entry.ActionGeo_CountryCode, entry.ActionGeo_ADM1Code, entry.ActionGeo_FullName))
@@ -54,20 +52,22 @@ def convert(entry):
     }
 
 def createRegion(type, countryCode, ADM1Code, fullname):
-    print(type)
-    print(countryCode)
-    print(ADM1Code)
-    print(fullname)
-    if(type == 1):
+    if(type == 1): #Country
         return {"isFIPS": True, "country": countryCode}
-    if(type == 2):
+    if(type == 2): #US State
         return {"country": countryCode, "state": getUsState(ADM1Code)}
-    if(type == 3):
-        return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
-    if(type == 5):
+    if(type == 5): #World State
         return {"isFIPS": True, "country": countryCode, "state": ADM1Code}
-    if(type == 4):
-        return {"isFIPS": True, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+    if(type == 3): #US City
+        if(ADM1Code != countryCode):
+            return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
+        else: #State not given
+            return {"country": countryCode, "city": getCity(fullname)}
+    if(type == 4): #World City
+        if(ADM1Code != countryCode):
+            return {"isFIPS": True, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+        else: #State not given
+            return {"isFIPS": True, "country": countryCode, "city": getCity(fullname)}
 
 def getCity(fullname):
     c = fullname.find(',')
