@@ -58,18 +58,23 @@ def createRegion(type, countryCode, ADM1Code, fullname):
     print(countryCode)
     print(ADM1Code)
     print(fullname)
-    return {"country": countryCode}
-    """if(type == 1):
+    if(type == 1):
         return {"country": countryCode}
-    if(type == 2 or type == 5):
+    if(type == 2):
+        return {"country": countryCode, "state": getUsState(ADM1Code)}
+    if(type == 3):
+        return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
+    if(type == 5):
         return {"country": countryCode, "state": ADM1Code}
-    if(type == 3 or type == 4):
-        return {"country": countryCode, "state": ADM1Code, "city":getCity(fullname)}"""
+    if(type == 4):
+        return {"country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
 
 def getCity(fullname):
     c = fullname.find(',')
     return fullname[0:c]
 
+def getUsState(ADM1Code):
+    return ADM1Code[:2] + '-' + ADM1Code[2:]
 
 def main():
     # Credential file for bigquery
