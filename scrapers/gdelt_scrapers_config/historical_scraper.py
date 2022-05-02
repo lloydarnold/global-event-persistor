@@ -24,27 +24,19 @@ query_file = config.get('query', 'QUERY_FILE')
 def convert(entry):
     date = str(entry.SQLDATE)
     
-    # regions only store countries for now
-    # TODO: make regions store city/state as well.
-    regions = []
-    if entry.Actor1Geo_CountryCode:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry.Actor1Geo_CountryCode
-        })
-        # regions.append(["continent", entry.Actor1Geo_CountryCode, entry.Actor1Geo_ADM1Code, "city"])
-    if entry.Actor2Geo_CountryCode:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry.Actor2Geo_CountryCode
-        })
-        # regions.append(["continent", entry.Actor2Geo_CountryCode, entry.Actor2Geo_ADM1Code, "city"])
-    if entry.ActionGeo_CountryCode:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry.ActionGeo_CountryCode
-        })
-        # regions.append(["continent", entry.ActionGeo_CountryCode, entry.ActionGeo_ADM1Code, "city"])
+    regions=[]
+    if(entry.ActionGeo_Type != 0):
+        regions.append(createRegion(entry.ActionGeo_Type, entry.ActionGeo_CountryCode, entry.ActionGeo_ADM1Code, entry.ActionGeo_FullName))
+    if(entry.Actor1Geo_Type != 0 and entry.Actor1Geo_FullName != entry.ActionGeo_FullName):
+        regions.append(createRegion(entry.Actor1Geo_Type, entry.Actor1Geo_CountryCode, entry.Actor1Geo_ADM1Code, entry.Actor1Geo_FullName))
+    if(entry.Actor2Geo_Type != 0 and entry.Actor2Geo_FullName != entry.ActionGeo_FullName and entry.Actor2Geo_FullName != entry.Actor1Geo_FullName):
+        regions.append(createRegion(entry.Actor2Geo_Type, entry.Actor2Geo_CountryCode, entry.Actor2Geo_ADM1Code, entry.Actor2Geo_FullName))
+    
+    actors=[]
+    if(entry.Actor1Name != None):
+        actors.append(entry.Actor1Name)
+    if(entry.Actor2Name != None and entry.Actor2Name != entry.Actor1Name):
+        actors.append(entry.Actor2Name)
     
     return {
         "timeStamp": date[:4]+"-"+date[4:6]+"-"+date[6:8],
@@ -54,11 +46,35 @@ def convert(entry):
         "category": "",
         "subcategory": "", # TODO: Implement subcategories
         "detail": entry.SOURCEURL,
-        "actors": [entry.Actor1Name, entry.Actor2Name],
+        "actors": actors,
         "stocks": [], # TODO: Get used stocks
         "eventRegions": regions
     }
 
+def createRegion(type, countryCode, ADM1Code, fullname):
+    if(type == 1): #Country
+        return {"isFIPS": True, "country": countryCode}
+    if(type == 2): #US State
+        return {"country": countryCode, "state": getUsState(ADM1Code)}
+    if(type == 5): #World State
+        return {"isFIPS": True, "country": countryCode, "state": ADM1Code}
+    if(type == 3): #US City
+        if(ADM1Code != countryCode):
+            return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
+        else: #State not given
+            return {"country": countryCode, "city": getCity(fullname)}
+    if(type == 4): #World City
+        if(ADM1Code != countryCode):
+            return {"isFIPS": True, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+        else: #State not given
+            return {"isFIPS": True, "country": countryCode, "city": getCity(fullname)}
+
+def getCity(fullname):
+    c = fullname.find(',')
+    return fullname[0:c]
+
+def getUsState(ADM1Code):
+    return ADM1Code[:2] + '-' + ADM1Code[2:]
 
 def main():
     # Credential file for bigquery
