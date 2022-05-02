@@ -173,7 +173,8 @@ This scraper comes with a `historical_config` file with the following fields:
 ```
 [database]
 DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
-IS_FIPS: 1 for FIPS, 0 for no FIPS.
+GLOBAL_IS_FIPS: 1 for FIPS, 0 for no FIPS.
+AMERICA_IS_FIPS: 1 for FIPS, 0 for no FIPS.
 ENTRIES_CAP: cap the number of entries being classified and sent to the database.
 CATEGORY_CLASSIFY: true for category classification and false for no classification. Remove category based classification if processing large amounts of data is more important than the categories of that data.
 NEWS_CLASSIFY: true for fake news classification and false for no classification. Note that not all events will contain whether it is fake news or not (this can depend on URLs that cannot be searched).
@@ -280,7 +281,8 @@ This scraper comes with a `live_config` file with the following fields:
 ```
 [database]
 DB_ENDPOINT: endpoint for sending multiple entries to. Use http://localhost:3000/events/create-many for local, http://3.82.122.96:3000/events/create-many is the current URL for our backend.
-IS_FIPS: 1 for FIPS, 0 for no FIPS.
+GLOBAL_IS_FIPS: 1 for FIPS, 0 for no FIPS.
+AMERICA_IS_FIPS: 1 for FIPS, 0 for no FIPS.
 ENTRIES_CAP: cap the number of entries being classified and sent to the database.
 CATEGORY_CLASSIFY: true for category classification and false for no classification. Remove category based classification if processing large amounts of data is more important than the categories of that data.  
 NEWS_CLASSIFY: true for fake news classification and false for no classification. Note that not all events will contain whether it is fake news or not (this can depend on URLs that cannot be searched).
