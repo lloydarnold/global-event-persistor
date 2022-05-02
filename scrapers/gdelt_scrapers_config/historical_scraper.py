@@ -116,17 +116,20 @@ def main():
         scutility.classify_entries(final_list)
 
         #Fake news classification
-    if news_classify:
+    if news_classify and len(final_list)!=0:
         predictions = classification.news_classification(final_list)
         temp = ["unlikely","likely"]
         for i in range(0, len(final_list)):
             if predictions[i]!=-1:
                 final_list[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
 
+    if len(final_list)!=0:
+        r = requests.post(db_endpoint, json=final_list)
 
-    r = requests.post(db_endpoint, json=final_list)
-
-    print(f"Status Code: {r.status_code}, Response: {r.json()}")
+        print(f"Status Code: {r.status_code}, Response: {r.json()}")
+        
+    else:
+        print("No entries found")
 
 
 if __name__ == "__main__":
