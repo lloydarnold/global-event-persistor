@@ -12,7 +12,8 @@ config = configparser.RawConfigParser()
 config.read(filenames = './live_config')
 
 db_endpoint = config.get('database', 'DB_ENDPOINT')
-is_fips = int(config.get('database', 'IS_FIPS'))
+global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
+america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
 entries_cap = int(config.get('database','ENTRIES_CAP'))
 category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
 news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
@@ -164,25 +165,36 @@ def compareDates(date1, date2): #Returns true if date1<=date2
 def convert(entry):
     date = entry[fields.index("SQLDATE")]
     
-    # regions only store countries for now
-    # TODO: make regions store city/state as well.
+
     regions = []
-    if entry[fields.index("Actor1Geo_CountryCode")]:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry[fields.index("Actor1Geo_CountryCode")]
-        })
-    if entry[fields.index("Actor2Geo_CountryCode")]:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry[fields.index("Actor2Geo_CountryCode")]
-        })
-    if entry[fields.index("ActionGeo_CountryCode")]:
-        regions.append({
-            "isFIPS": is_fips,
-            "country": entry[fields.index("ActionGeo_CountryCode")]
-        })
+
+    ActionGeo_Type =  entry[fields.index("ActionGeo_Type")]
+    ActionGeo_CountryCode = entry[fields.index("ActionGeo_CountryCode")]
+    ActionGeo_ADM1Code = entry[fields.index("ActionGeo_ADM1Code")]
+    ActionGeo_FullName = entry[fields.index("ActionGeo_FullName")]
+    Actor1Geo_Type = entry[fields.index("Actor1Geo_Type")]
+    Actor1Geo_FullName = entry[fields.index("Actor1Geo_FullName")]
+    Actor1Geo_ADM1Code = entry[fields.index("Actor1Geo_ADM1Code")]
+    Actor1Geo_CountryCode = entry[fields.index("Actor1Geo_CountryCode")]
+    Actor2Geo_Type = entry[fields.index("Actor2Geo_Type")]
+    Actor2Geo_FullName = entry[fields.index("Actor2Geo_FullName")]
+    Actor2Geo_ADM1Code = entry[fields.index("Actor2Geo_ADM1Code")]
+    Actor2Geo_CountryCode = entry[fields.index("Actor2Geo_CountryCode")]
+
+
+    if(ActionGeo_Type != 0):
+        regions.append(createRegion(ActionGeo_Type, ActionGeo_CountryCode, ActionGeo_ADM1Code, ActionGeo_FullName))
+    if(Actor1Geo_Type != 0 and Actor1Geo_FullName != ActionGeo_FullName):
+        regions.append(createRegion(Actor1Geo_Type, Actor1Geo_CountryCode, Actor1Geo_ADM1Code, Actor1Geo_FullName))
+    if(Actor2Geo_Type != 0 and Actor2Geo_FullName != ActionGeo_FullName and Actor2Geo_FullName != Actor1Geo_FullName):
+        regions.append(createRegion(Actor2Geo_Type, Actor2Geo_CountryCode, Actor2Geo_ADM1Code, Actor2Geo_FullName))
     
+    actors=[]
+    if(entry[fields.index("Actor1Name")] != None):
+        actors.append(entry[fields.index("Actor1Name")])
+    if(entry[fields.index("Actor2Name")] != None and entry[fields.index("Actor2Name")] != entry[fields.index("Actor1Name")]):
+        actors.append(entry[fields.index("Actor2Name")])
+
     return {
         "timeStamp": date[:4]+"-"+date[4:6]+"-"+date[6:8],
         "positivity": float(entry[fields.index("AvgTone")]),
@@ -196,6 +208,30 @@ def convert(entry):
         "eventRegions": regions
     }
 
+def createRegion(type, countryCode, ADM1Code, fullname):
+    if(type == 1): #Country
+        return {"isFIPS": global_is_fips, "country": countryCode}
+    if(type == 2): #US State
+        return {"isFIPS": america_is_fips, "country": countryCode, "state": getUsState(ADM1Code)}
+    if(type == 5): #World State
+        return {"isFIPS": global_is_fips, "country": countryCode, "state": ADM1Code}
+    if(type == 3): #US City
+        if(ADM1Code != countryCode):
+            return {"isFIPS": america_is_fips, "country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
+        else: #State not given
+            return {"isFIPS": america_is_fips, "country": countryCode, "city": getCity(fullname)}
+    if(type == 4): #World City
+        if(ADM1Code != countryCode):
+            return {"isFIPS": global_is_fips, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+        else: #State not given
+            return {"isFIPS": global_is_fips, "country": countryCode, "city": getCity(fullname)}
+
+def getCity(fullname):
+    c = fullname.find(',')
+    return fullname[0:c]
+
+def getUsState(ADM1Code):
+    return ADM1Code[:2] + '-' + ADM1Code[2:]
 
 def main():
     # Date validation

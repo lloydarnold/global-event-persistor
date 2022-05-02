@@ -10,7 +10,8 @@ config = configparser.RawConfigParser()
 config.read(filenames = './historical_config')
 
 db_endpoint = config.get('database', 'DB_ENDPOINT')
-is_fips = int(config.get('database', 'IS_FIPS'))
+global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
+america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
 entries_cap = int(config.get('database', 'ENTRIES_CAP'))
 category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
 news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
@@ -53,21 +54,21 @@ def convert(entry):
 
 def createRegion(type, countryCode, ADM1Code, fullname):
     if(type == 1): #Country
-        return {"isFIPS": True, "country": countryCode}
+        return {"isFIPS": global_is_fips, "country": countryCode}
     if(type == 2): #US State
-        return {"country": countryCode, "state": getUsState(ADM1Code)}
+        return {"isFIPS": america_is_fips, "country": countryCode, "state": getUsState(ADM1Code)}
     if(type == 5): #World State
-        return {"isFIPS": True, "country": countryCode, "state": ADM1Code}
+        return {"isFIPS": global_is_fips, "country": countryCode, "state": ADM1Code}
     if(type == 3): #US City
         if(ADM1Code != countryCode):
-            return {"country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
+            return {"isFIPS": america_is_fips, "country": countryCode, "state": getUsState(ADM1Code), "city":getCity(fullname)}
         else: #State not given
-            return {"country": countryCode, "city": getCity(fullname)}
+            return {"isFIPS": america_is_fips, "country": countryCode, "city": getCity(fullname)}
     if(type == 4): #World City
         if(ADM1Code != countryCode):
-            return {"isFIPS": True, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
+            return {"isFIPS": global_is_fips, "country": countryCode, "state": ADM1Code, "city":getCity(fullname)}
         else: #State not given
-            return {"isFIPS": True, "country": countryCode, "city": getCity(fullname)}
+            return {"isFIPS": global_is_fips, "country": countryCode, "city": getCity(fullname)}
 
 def getCity(fullname):
     c = fullname.find(',')

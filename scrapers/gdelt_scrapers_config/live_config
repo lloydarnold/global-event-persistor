@@ -1,6 +1,7 @@
 [database]
 DB_ENDPOINT = http://localhost:3000/events/create-many
-IS_FIPS = 1
+GLOBAL_IS_FIPS = 1
+AMERICA_IS_FIPS = 1
 ENTRIES_CAP = 20
 CATEGORY_CLASSIFY = True
 NEWS_CLASSIFY = True
