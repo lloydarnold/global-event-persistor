@@ -164,9 +164,6 @@ def compareDates(date1, date2): #Returns true if date1<=date2
 
 def convert(entry):
     date = entry[fields.index("SQLDATE")]
-    
-
-    regions = []
 
     ActionGeo_Type =  entry[fields.index("ActionGeo_Type")]
     ActionGeo_CountryCode = entry[fields.index("ActionGeo_CountryCode")]
@@ -181,7 +178,7 @@ def convert(entry):
     Actor2Geo_ADM1Code = entry[fields.index("Actor2Geo_ADM1Code")]
     Actor2Geo_CountryCode = entry[fields.index("Actor2Geo_CountryCode")]
 
-
+    regions = []
     if(ActionGeo_Type != 0):
         regions.append(createRegion(ActionGeo_Type, ActionGeo_CountryCode, ActionGeo_ADM1Code, ActionGeo_FullName))
     if(Actor1Geo_Type != 0 and Actor1Geo_FullName != ActionGeo_FullName):
@@ -203,7 +200,7 @@ def convert(entry):
         "category": "",
         "subcategory": "", # TODO: Implement subcategories
         "detail": entry[fields.index("SOURCEURL")][:-1],
-        "actors": [entry[fields.index("Actor1Name")], entry[fields.index("Actor2Name")]],
+        "actors": actors,
         "stocks": [], # TODO: Get used stocks
         "eventRegions": regions
     }
