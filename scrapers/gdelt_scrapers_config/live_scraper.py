@@ -335,7 +335,7 @@ def main():
             final_entries.append(converted_entry)
     
     #Fake news classification
-    if news_classify:
+    if news_classify and len(final_entries)!=0:
         predictions = classification.news_classification(final_entries)
         temp = ["unlikely","likely"]
         for i in range(0, len(final_entries)):
@@ -343,8 +343,11 @@ def main():
                 final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
 
 
-    r = requests.post(db_endpoint, json=final_entries)
-    print(f"Status Code: {r.status_code}")
+    if len(final_entries)!=0:
+        r = requests.post(db_endpoint, json=final_entries)
+        print(f"Status Code: {r.status_code}")
+    else:
+        print("No entries found")
     
     # delete .csv file
     os.remove(csv_file)
