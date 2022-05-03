@@ -317,7 +317,6 @@ def main():
             except:
                 print("An exception occured when parsing this entry")
     
-    converted_entries = converted_entries[:entries_cap] # limitting to 10 entries for testing
     
     if category_classify:
         print("classifying...")
@@ -339,6 +338,7 @@ def main():
             if predictions[i]!=-1:
                 final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
 
+    converted_entries = converted_entries[:entries_cap]
 
     if len(final_entries)!=0:
         r = requests.post(db_endpoint, json=final_entries)
