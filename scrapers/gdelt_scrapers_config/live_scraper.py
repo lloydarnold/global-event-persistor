@@ -322,7 +322,6 @@ def main():
         print("classifying...")
         scutility.classify_entries(converted_entries)
 
-    print("uploading...")
     final_entries = []
     for converted_entry in converted_entries:
         if categoryFilter(converted_entry):
@@ -340,6 +339,8 @@ def main():
 
     converted_entries = converted_entries[:entries_cap]
 
+    print("uploading...")
+    
     if len(final_entries)!=0:
         r = requests.post(db_endpoint, json=final_entries)
         print(f"Status Code: {r.status_code}")
