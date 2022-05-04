@@ -330,7 +330,7 @@ def main():
     for converted_entry in converted_entries:
         if categoryFilter(converted_entry):
             if converted_entry["category"] == "INVALID_SOURCE":
-                converted_entry["category"] == ""
+                converted_entry["category"] = ""
             final_entries.append(converted_entry)
     
     #Fake news classification
