@@ -11,24 +11,28 @@ import classification
 config = configparser.RawConfigParser()
 config.read(filenames = './live_config')
 
-db_endpoint = config.get('database', 'DB_ENDPOINT')
-global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
-america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
-entries_cap = int(config.get('database','ENTRIES_CAP'))
-category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
-news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
+try:
+    db_endpoint = config.get('database', 'DB_ENDPOINT')
+    global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
+    america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
+    entries_cap = int(config.get('database','ENTRIES_CAP'))
+    category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
+    news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
 
 
-date_range = json.loads(config.get('filter', 'DATE_RANGE'))
-pos_range = json.loads(config.get('filter', 'POS_RANGE'))
-rel_range = json.loads(config.get('filter', 'REL_RANGE'))
-category_list = json.loads(config.get('filter', 'CATEGORY_LIST'))
-actor_list = json.loads(config.get('filter', 'ACTOR_LIST'))
-country_list = json.loads(config.get('filter', 'COUNTRY_LIST'))
+    date_range = json.loads(config.get('filter', 'DATE_RANGE'))
+    pos_range = json.loads(config.get('filter', 'POS_RANGE'))
+    rel_range = json.loads(config.get('filter', 'REL_RANGE'))
+    category_list = json.loads(config.get('filter', 'CATEGORY_LIST'))
+    actor_list = json.loads(config.get('filter', 'ACTOR_LIST'))
+    country_list = json.loads(config.get('filter', 'COUNTRY_LIST'))
 
-gdelt_base_url = config.get('gdelt', 'GDELT_URL')
-gdelt_file = int(config.get('gdelt', 'GDELT_FILE'))
-
+    gdelt_base_url = config.get('gdelt', 'GDELT_URL')
+    gdelt_file = int(config.get('gdelt', 'GDELT_FILE'))
+except:
+    print("Check filters")
+    exit()
+    
 fields = [
     "GLOBALEVENTID",
     "SQLDATE",
@@ -165,15 +169,15 @@ def compareDates(date1, date2): #Returns true if date1<=date2
 def convert(entry):
     date = entry[fields.index("SQLDATE")]
 
-    ActionGeo_Type =  entry[fields.index("ActionGeo_Type")]
+    ActionGeo_Type =  int(entry[fields.index("ActionGeo_Type")])
     ActionGeo_CountryCode = entry[fields.index("ActionGeo_CountryCode")]
     ActionGeo_ADM1Code = entry[fields.index("ActionGeo_ADM1Code")]
     ActionGeo_FullName = entry[fields.index("ActionGeo_FullName")]
-    Actor1Geo_Type = entry[fields.index("Actor1Geo_Type")]
+    Actor1Geo_Type = int(entry[fields.index("Actor1Geo_Type")])
     Actor1Geo_FullName = entry[fields.index("Actor1Geo_FullName")]
     Actor1Geo_ADM1Code = entry[fields.index("Actor1Geo_ADM1Code")]
     Actor1Geo_CountryCode = entry[fields.index("Actor1Geo_CountryCode")]
-    Actor2Geo_Type = entry[fields.index("Actor2Geo_Type")]
+    Actor2Geo_Type = int(entry[fields.index("Actor2Geo_Type")])
     Actor2Geo_FullName = entry[fields.index("Actor2Geo_FullName")]
     Actor2Geo_ADM1Code = entry[fields.index("Actor2Geo_ADM1Code")]
     Actor2Geo_CountryCode = entry[fields.index("Actor2Geo_CountryCode")]
