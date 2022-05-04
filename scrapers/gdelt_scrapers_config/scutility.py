@@ -6,7 +6,11 @@ import configparser
 config = configparser.RawConfigParser()
 config.read(filenames = './scutility_config')
 
-classification_url = config.get('inference', 'CLASSIFICATION_URL')
+try:
+    classification_url = config.get('inference', 'CLASSIFICATION_URL')
+except:
+    print("Check config file")
+    exit()
 
 def classify_entries(entries: list[dict]) -> None:
     """Classifies entries; Puts 'INVALID_SOURCE' if the source url is not a valid web page"""
