@@ -9,18 +9,22 @@ import classification
 config = configparser.RawConfigParser()
 config.read(filenames = './historical_config')
 
-db_endpoint = config.get('database', 'DB_ENDPOINT')
-global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
-america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
-entries_cap = int(config.get('database', 'ENTRIES_CAP'))
-category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
-news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
+try:
+    db_endpoint = config.get('database', 'DB_ENDPOINT')
+    global_is_fips = int(config.get('database', 'GLOBAL_IS_FIPS'))
+    america_is_fips = int(config.get('database', 'AMERICA_IS_FIPS'))
+    entries_cap = int(config.get('database', 'ENTRIES_CAP'))
+    category_classify = json.loads(config.get('database', 'CATEGORY_CLASSIFY').lower())
+    news_classify = json.loads(config.get('database', 'NEWS_CLASSIFY').lower())
 
-account_file = config.get('google', 'ACCOUNT_FILE')
-google_scopes = json.loads(config.get('google', 'GOOGLE_SCOPES'))
+    account_file = config.get('google', 'ACCOUNT_FILE')
+    google_scopes = json.loads(config.get('google', 'GOOGLE_SCOPES'))
 
-query_file = config.get('query', 'QUERY_FILE')
-
+    query_file = config.get('query', 'QUERY_FILE')
+except:
+    print("Check config file")
+    exit()
+    
 # Converts raw gdelt entries to python dictionary with our own fields
 def convert(entry):
     date = str(entry.SQLDATE)
