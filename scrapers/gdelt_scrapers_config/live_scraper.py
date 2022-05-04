@@ -30,7 +30,7 @@ try:
     gdelt_base_url = config.get('gdelt', 'GDELT_URL')
     gdelt_file = int(config.get('gdelt', 'GDELT_FILE'))
 except:
-    print("Check filters")
+    print("Check config file")
     exit()
     
 fields = [
