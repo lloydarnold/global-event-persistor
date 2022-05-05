@@ -336,7 +336,8 @@ def main():
 
 
     # limit number of entries
-    converted_entries = converted_entries[:entries_cap]
+    if entries_cap>0:
+        converted_entries = converted_entries[:entries_cap]
 
     print("uploading...")
     

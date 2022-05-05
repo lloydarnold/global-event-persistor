@@ -97,7 +97,11 @@ def main():
     print(query)
 
     # Sends query to bigquery
-    query_job = client.query(query, job_config=bigquery.QueryJobConfig())
+    try:
+        query_job = client.query(query, job_config=bigquery.QueryJobConfig())
+    except:
+        print("Check query")
+        exit()
     data = query_job.result()
     rows = list(data)
 
