@@ -127,7 +127,7 @@ def main():
             if final_list[i]["category"] == "INVALID_SOURCE":
                 final_list[i]["category"] = "NA"
             if predictions[i]!=-1:
-                final_list[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
+                final_list[i]['detail'] += ", this is "+temp[predictions[i]]+ " to be fake news"
 
     if len(final_list)!=0:
         r = requests.post(db_endpoint, json=final_list)
