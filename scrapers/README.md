@@ -292,7 +292,7 @@ DATE_RANGE: filter entries by dates. [YYYY-MM-DD,YYYY-MM-DD] gives the from and 
 POS_RANGE: filter entries by positivity. [x,y] gives the lower and upper bound for positivity (inclusive of both ends). Use [] for no filtering.
 REL_RANGE: filter entries by relativitiy. [x,y] gives the lower and upper bound for relativity (inclusive of both ends). Use [] for no filtering.
 CATEGORY_LIST: filter entries by category. Give a list of categories, only entries that have at least one of these categories will be added. Use [] for no filtering.
-ACTOR_LIST: filter by actors. [[Caregiver, Washington],Poland] will only include entries that have (Caregiver or Washington) and Poland as their actors. Use [] for no filtering.
+ACTOR_LIST: filter by actors. [["Caregiver", "Washington"],["Poland"]] will only include entries that have (Caregiver or Washington) and Poland as their actors. Use [] for no filtering.
 COUNTRY_LIST: filter by countries. Same format as ACTOR_LIST except this is restricted to country codes (FIPS is the current standard for GDELT).
 
 [gdelt]
