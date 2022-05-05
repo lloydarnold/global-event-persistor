@@ -124,7 +124,7 @@ def main():
         predictions = classification.news_classification(final_list)
         temp = ["unlikely","likely"]
         for i in range(0, len(final_list)):
-            if final_list[i]["category"] == "INVALID_SOURCE":
+            if final_list[i]["category"] == "INVALID_SOURCE" or final_list[i]["category"]=="":
                 final_list[i]["category"] = "NA"
             if predictions[i]!=-1:
                 final_list[i]['detail'] += ", this is "+temp[predictions[i]]+ " to be fake news"

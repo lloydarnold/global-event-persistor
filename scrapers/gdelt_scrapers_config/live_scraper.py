@@ -322,7 +322,7 @@ def main():
     final_entries = []
     for converted_entry in converted_entries:
         if categoryFilter(converted_entry):
-            if converted_entry["category"] == "INVALID_SOURCE":
+            if converted_entry["category"] == "INVALID_SOURCE" or converted_entry["category"]=="":
                 converted_entry["category"] = "NA"
             final_entries.append(converted_entry)
     
