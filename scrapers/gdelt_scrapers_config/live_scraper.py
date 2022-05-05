@@ -340,7 +340,7 @@ def main():
         temp = ["unlikely","likely"]
         for i in range(0, len(final_entries)):
             if predictions[i]!=-1:
-                final_entries[i]['detail'] += ", this "+temp[predictions[i]]+ " to be fake news"
+                final_entries[i]['detail'] += ", this is "+temp[predictions[i]]+ " to be fake news"
 
     converted_entries = converted_entries[:entries_cap]
 
