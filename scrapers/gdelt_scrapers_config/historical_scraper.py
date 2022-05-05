@@ -116,7 +116,7 @@ def main():
     for entry in entries:
         final_list.append(entry)
 
-    if category_classify:
+    if category_classify and len(final_list)!=0:
         scutility.classify_entries(final_list)
 
         #Fake news classification
