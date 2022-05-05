@@ -136,9 +136,10 @@ def filterEntry(entry):
         for i in country_list:
             tempBool=False
             for x in i:
-                if {"country":x} in entry["eventRegions"] or {"isFIPS": 1, "country":x} in entry["eventRegions"]:
-                    tempBool=True
-            boolean = boolean and tempBool
+                for region in entry["eventRegions"]:
+                    if region["country"]==x:
+                        tempBool=True
+            boolean = boolean and tempBool 
 
     return boolean 
 
