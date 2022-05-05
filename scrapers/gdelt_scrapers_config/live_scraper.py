@@ -322,7 +322,7 @@ def main():
                 print("An exception occured when parsing this entry")
     
     
-    if category_classify:
+    if category_classify and len(converted_entries)!=0:
         print("classifying...")
         scutility.classify_entries(converted_entries)
 
