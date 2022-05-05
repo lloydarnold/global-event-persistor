@@ -110,14 +110,6 @@ def filterEntry(entry):
     if len(rel_range)!=0:
         boolean = boolean and int(rel_range[0])<=entry["relevance"] and int(rel_range[1])>=entry["relevance"]
 
-    #Source filter:
-
-    #category filter:
-
-    #subcategory filter:
-
-    #detail filter:
-
     #actors filter:
     if len(actor_list)!=0:
 
@@ -127,8 +119,6 @@ def filterEntry(entry):
                 if x in entry["actors"]:
                     tempBool=True
             boolean = boolean and tempBool
-
-    #stocks filter:
 
     #eventRegions filter:
     if len(country_list)!=0:
@@ -143,13 +133,13 @@ def filterEntry(entry):
 
     return boolean 
 
-def categoryFilter(entry):
+def categoryFilter(entry): # category filter
     if len(category_list)!=0:
         if entry["category"] not in category_list:
             return False
     return True
 
-def compareDates(date1, date2): #Returns true if date1<=date2
+def compareDates(date1, date2): # returns true if date1<=date2
     if int(date1[:4]) > int(date2[:4]):
         return False
     elif int(date1[:4]) < int(date2[:4]):
@@ -311,6 +301,7 @@ def main():
     csv_file = zip_file[:-4]
     print(csv_file)
 
+    # converting entries into our format and perform most filtering
     print("parsing...")
     converted_entries = []
     with open(csv_file, mode="r", encoding="utf-8") as entries:
@@ -322,11 +313,12 @@ def main():
             except:
                 print("An exception occured when parsing this entry")
     
-    
+    # category classification
     if category_classify and len(converted_entries)!=0:
         print("classifying...")
         scutility.classify_entries(converted_entries)
 
+    # category filtering
     final_entries = []
     for converted_entry in converted_entries:
         if categoryFilter(converted_entry):
@@ -334,7 +326,7 @@ def main():
                 converted_entry["category"] = "NA"
             final_entries.append(converted_entry)
     
-    #Fake news classification
+    # fake news classification
     if news_classify and len(final_entries)!=0:
         predictions = classification.news_classification(final_entries)
         temp = ["unlikely","likely"]
@@ -342,6 +334,8 @@ def main():
             if predictions[i]!=-1:
                 final_entries[i]['detail'] += ", this is "+temp[predictions[i]]+ " to be fake news"
 
+
+    # limit number of entries
     converted_entries = converted_entries[:entries_cap]
 
     print("uploading...")
