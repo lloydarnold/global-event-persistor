@@ -1,0 +1,179 @@
+# This is a HJSON-File, so comments and so on can be used! See https://hjson.org/
+# Furthermore this is first of all the actual config file, but as default just filled with examples.
+{
+  # Every URL has to be in an array-object in "base_urls".
+  # The same URL in combination with the same crawler may only appear once in this array.
+  "base_urls" : [
+    {
+      # Start crawling from faz.net
+      "url": "https://www.bbc.com/sport",
+
+      # Overwrite the default crawler and use th RecursiveCrawler instead
+      "crawler": "SitemapCrawler",
+
+      "overwrite_heuristics": {
+        "meta_contains_article_keyword": true,
+        "og_type": true,
+        "is_not_from_subdomain": true,
+        "restrict_domains_to": ["https://www.bbc.com/sport", "https://www.bbc.co.uk/sport"]
+      },
+
+      "pass_heuristics_condition": "restrict_domains_to and og_type"
+
+
+
+      # Because this site is weirt, use the
+      # meta_contains_article_keyword-heuristic and disable all others because
+      # overwrite will merge the defaults from "newscrawler.cfg" with
+      # this
+      // "overwrite_heuristics": {
+      //   "meta_contains_article_keyword": true,
+      //   "og_type": false,
+      //   "linked_headlines": false,
+      //   "self_linked_headlines": false
+      // },
+      # Also state that in the condition, all heuristics used in the condition
+      # have to be activated in "overwrite_heuristics" (or default) as well.
+      // "pass_heuristics_condition": "meta_contains_article_keyword"
+    },
+    {
+      # Start crawling from faz.net
+      "url": "https://www.theguardian.com/sport",
+
+      # Overwrite the default crawler and use th RecursiveCrawler instead
+      "crawler": "SitemapCrawler",
+
+      "overwrite_heuristics": {
+        "meta_contains_article_keyword": true,
+        "og_type": true,
+        "is_not_from_subdomain": true,
+        "restrict_domains_to": ["https://www.theguardian.com/sport"]
+      },
+
+      "pass_heuristics_condition": "restrict_domains_to and og_type"
+
+
+
+      # Because this site is weirt, use the
+      # meta_contains_article_keyword-heuristic and disable all others because
+      # overwrite will merge the defaults from "newscrawler.cfg" with
+      # this
+      // "overwrite_heuristics": {
+      //   "meta_contains_article_keyword": true,
+      //   "og_type": false,
+      //   "linked_headlines": false,
+      //   "self_linked_headlines": false
+      // },
+      # Also state that in the condition, all heuristics used in the condition
+      # have to be activated in "overwrite_heuristics" (or default) as well.
+      // "pass_heuristics_condition": "meta_contains_article_keyword"
+    },
+
+    {
+      # Start crawling from faz.net
+      "url": "https://www.nbcsports.com/",
+
+      # Overwrite the default crawler and use th RecursiveCrawler instead
+      "crawler": "SitemapCrawler",
+
+      "overwrite_heuristics": {
+        "meta_contains_article_keyword": true,
+        "og_type": true,
+        "is_not_from_subdomain": true,
+        "restrict_domains_to": []
+      },
+
+      "pass_heuristics_condition": "restrict_domains_to and og_type"
+
+
+
+      # Because this site is weirt, use the
+      # meta_contains_article_keyword-heuristic and disable all others because
+      # overwrite will merge the defaults from "newscrawler.cfg" with
+      # this
+      // "overwrite_heuristics": {
+      //   "meta_contains_article_keyword": true,
+      //   "og_type": false,
+      //   "linked_headlines": false,
+      //   "self_linked_headlines": false
+      // },
+      # Also state that in the condition, all heuristics used in the condition
+      # have to be activated in "overwrite_heuristics" (or default) as well.
+      // "pass_heuristics_condition": "meta_contains_article_keyword"
+    },
+
+    {
+      # Start crawling from faz.net
+      "url": "https://abcnews.go.com/Sports",
+
+      # Overwrite the default crawler and use th RecursiveCrawler instead
+      "crawler": "SitemapCrawler",
+
+      "overwrite_heuristics": {
+        "meta_contains_article_keyword": true,
+        "og_type": true,
+        "is_not_from_subdomain": true,
+        "restrict_domains_to": ["https://abcnews.go.com/Sports"]
+      },
+
+      "pass_heuristics_condition": "restrict_domains_to and og_type"
+
+
+
+      # Because this site is weirt, use the
+      # meta_contains_article_keyword-heuristic and disable all others because
+      # overwrite will merge the defaults from "newscrawler.cfg" with
+      # this
+      // "overwrite_heuristics": {
+      //   "meta_contains_article_keyword": true,
+      //   "og_type": false,
+      //   "linked_headlines": false,
+      //   "self_linked_headlines": false
+      // },
+      # Also state that in the condition, all heuristics used in the condition
+      # have to be activated in "overwrite_heuristics" (or default) as well.
+      // "pass_heuristics_condition": "meta_contains_article_keyword"
+    },
+    // {
+    //   # Start crawling from faz.net
+    //   "url": "https://www.thesun.co.uk/sport/",
+
+    //   # Overwrite the default crawler and use th RecursiveCrawler instead
+    //   "crawler": "SitemapCrawler",
+
+    //   # Because this site is weirt, use the
+    //   # meta_contains_article_keyword-heuristic and disable all others because
+    //   # overwrite will merge the defaults from "newscrawler.cfg" with
+    //   # this
+    //   "overwrite_heuristics": {
+    //     "meta_contains_article_keyword": true,
+    //     "og_type": true,
+    //     "is_not_from_subdomain": true
+    //   },
+    //   # Also state that in the condition, all heuristics used in the condition
+    //   # have to be activated in "overwrite_heuristics" (or default) as well.
+    //   // "pass_heuristics_condition": "meta_contains_article_keyword"
+    // },
+    // {
+    //   # Start crawling from faz.net
+    //   "url": "https://www.theguardian.com/uk/sport",
+
+    //   # Overwrite the default crawler and use th RecursiveCrawler instead
+    //   "crawler": "SitemapCrawler",
+
+    //   // # Because this site is weirt, use the
+    //   // # meta_contains_article_keyword-heuristic and disable all others because
+    //   // # overwrite will merge the defaults from "newscrawler.cfg" with
+    //   // # this
+    //   // "overwrite_heuristics": {
+    //   //   "meta_contains_article_keyword": true,
+    //   //   "og_type": false,
+    //   //   "linked_headlines": false,
+    //   //   "self_linked_headlines": false
+    //   // },
+    //   // # Also state that in the condition, all heuristics used in the condition
+    //   // # have to be activated in "overwrite_heuristics" (or default) as well.
+    //   // "pass_heuristics_condition": "meta_contains_article_keyword"
+    // },
+  ]
+}

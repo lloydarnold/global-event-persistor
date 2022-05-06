@@ -12,4 +12,4 @@ CLASSIFICATION_URL = http://127.0.0.1:8080/news-classification
 SENTIMENT_URL = http://127.0.0.1:8080/finbert
 
 [database]
-DB_ENDPOINT= http://3.82.122.96:3000/events/create-many
+DB_ENDPOINT= http://localhost:3000/events/create-many

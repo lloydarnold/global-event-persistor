@@ -5,6 +5,7 @@ import optparse
 import time
 import json
 from flask import request
+import threading
 import numpy as np
 import sys
 import os
@@ -57,6 +58,7 @@ start = int(round(time.time()))
 size = 20
 model = None
 modelName = ""
+lock = threading.Lock()
 #news_sentiment = GeneralNewsSentiment()
 
 def chunk(arr, size):
@@ -81,6 +83,7 @@ def activate(name):
 @app.route("/finbert",methods=['POST'])
 def score_fin():
     global model, modelName
+    lock.acquire()
     logger.info("Beginning to load FinBERT model")
     activate("FinBERT")
     texts=request.get_json()['texts']
@@ -94,6 +97,7 @@ def score_fin():
         preds = np.concatenate((preds, tf.nn.softmax(output, axis = 1).numpy()), axis = 0)
 
     # print(input)
+    lock.release()
     return { "ans": preds.tolist() }
 
     # text=request.get_json()['text']
@@ -102,6 +106,7 @@ def score_fin():
 @app.route("/general_news_sentiment",methods=['POST'])
 def score_general():
     global model, modelName
+    lock.acquire()
     logger.info("Beginning to load Roberta model")
     activate("GeneralNewsSentiment")
     texts=request.get_json()['texts']
@@ -117,6 +122,7 @@ def score_general():
         preds = np.concatenate((preds, pred), axis = 0)
 
     # print(input)
+    lock.release()
     return { "ans": preds.tolist() }
 
     # text=request.get_json()['text']
@@ -125,6 +131,7 @@ def score_general():
 @app.route("/tweetbert",methods=['POST'])
 def score_tweet():
     global model, modelName
+    lock.acquire()
     logger.info("Beginning to load TweetBERT model")
     activate("TweetBERT")
     texts=request.get_json()['texts']
@@ -138,11 +145,13 @@ def score_tweet():
         preds = np.concatenate((preds, tf.nn.softmax(output, axis = 1).numpy()[:, [2, 0, 1]]), axis = 0)
 
     # print(input)
+    lock.release()
     return { "ans": preds.tolist() }
 
 @app.route("/news-classification",methods=['POST'])
 def classify_news():
     global model, modelName
+    lock.acquire()
     logger.info("Beginning to load news classification model")
     activate("NewsClassification")
     texts=request.get_json()['texts']
@@ -164,6 +173,7 @@ def classify_news():
             })
 
     # print(input)
+    lock.release()
     return jsonify({ "ans": preds })
 
 if __name__ == '__main__':

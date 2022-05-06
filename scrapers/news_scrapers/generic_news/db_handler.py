@@ -37,14 +37,17 @@ def get_sentiment(texts):
 
 def find_date(news):
     possible_dates = [news['date_publish'], news['date_modify'], news['date_download']]
-    non_null_dates = [x for x in possible_dates if x != "NULL"]
+    non_null_dates = [x for x in possible_dates if x not in ["NULL", None]]
     if len(non_null_dates) > 0:
         return non_null_dates[0]
     else:
         return None
 
 def make_event(news, sentiment, category):
-    logging.info(news)
+    if debug:
+        news_for_printing = dict(news)
+        news_for_printing['maintext'] = news_for_printing['maintext'][:50]
+        logging.info(json.dumps(news_for_printing, indent = 4))
     delta_sent = 100*(sentiment[0] - sentiment[1])
     
     event = {
@@ -56,14 +59,15 @@ def make_event(news, sentiment, category):
         "eventRegions": []
     }
     if debug:
-        logging.info(event)
+        logging.info(json.dumps(event, indent = 4))
     return event
 
 def db_push(events):
     res = requests.post(db_endpoint, json = events)
     logger.info("Events pushed with response {}".format(res.status_code))
     if debug:
-        logger.info(res.text)
+        js = json.loads(res.text)
+        logger.info(json.dumps(js, indent = 4))
     return res.text
 
 @app.route("/push_events", methods=['POST'])

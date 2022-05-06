@@ -1,0 +1,19 @@
+[database]
+DB_ENDPOINT = http://localhost:3000/events/create-many
+GLOBAL_IS_FIPS = 1
+AMERICA_IS_FIPS = 1
+ENTRIES_CAP = 20
+CATEGORY_CLASSIFY = True
+NEWS_CLASSIFY = True
+
+[filter]
+DATE_RANGE=["2000-01-01","2030-01-01"]
+POS_RANGE=[]
+REL_RANGE=[]
+CATEGORY_LIST=[]
+ACTOR_LIST=[]
+COUNTRY_LIST=[]
+
+[gdelt]
+GDELT_URL = http://data.gdeltproject.org/events/
+GDELT_FILE = 0
